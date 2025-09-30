@@ -1,0 +1,16 @@
+{
+  "auto_approve": true,
+
+  "workspace": {
+    "frontend": "frontend",
+    "backend": "backend"
+  },
+
+  "ignore": ["node_modules", "dist", "build", ".git", ".env"],
+
+  "defaults": {
+    "language": "typescript",
+    "framework": "react",
+    "package_manager": "npm"
+  }
+}
