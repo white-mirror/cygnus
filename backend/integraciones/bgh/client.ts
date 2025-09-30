@@ -132,7 +132,10 @@ export class BGHClient {
     return this.parseDevices(dataPacket);
   }
 
-  async getDeviceStatus(homeId: number, deviceId: number): Promise<DeviceStatus> {
+  async getDeviceStatus(
+    homeId: number,
+    deviceId: number,
+  ): Promise<DeviceStatus> {
     const devices = await this.getDevices(homeId);
     const device = devices[deviceId];
     if (!device) {
@@ -185,12 +188,18 @@ export class BGHClient {
 
   private async login(email: string, password: string): Promise<TokenPayload> {
     try {
-      const response = await this.http.post(LOGIN_ENDPOINT, { user: email, password });
+      const response = await this.http.post(LOGIN_ENDPOINT, {
+        user: email,
+        password,
+      });
       const data = this.extractJson(response, "authentication");
       const token = data.d;
 
       if (!token) {
-        throw new BGHAuthenticationError("Missing authentication token", response);
+        throw new BGHAuthenticationError(
+          "Missing authentication token",
+          response,
+        );
       }
 
       if (typeof token === "string") {
@@ -200,11 +209,17 @@ export class BGHClient {
       if (typeof token === "object" && token !== null && "Token" in token) {
         const tokenValue = (token as JsonObject).Token;
         if (typeof tokenValue === "string") {
-          return { ...(token as JsonObject), Token: tokenValue } as TokenPayload;
+          return {
+            ...(token as JsonObject),
+            Token: tokenValue,
+          } as TokenPayload;
         }
       }
 
-      throw new BGHAuthenticationError("Unexpected authentication token format", response);
+      throw new BGHAuthenticationError(
+        "Unexpected authentication token format",
+        response,
+      );
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new BGHAuthenticationError(
@@ -216,7 +231,10 @@ export class BGHClient {
     }
   }
 
-  private async post(endpoint: string, payload: JsonObject = {}): Promise<AxiosResponse> {
+  private async post(
+    endpoint: string,
+    payload: JsonObject = {},
+  ): Promise<AxiosResponse> {
     const token = await this.ensureToken();
     const body: JsonObject = { ...payload };
 
@@ -237,7 +255,9 @@ export class BGHClient {
             response,
           );
         }
-        throw new BGHApiError(`Request to ${endpoint} failed: ${error.message}`);
+        throw new BGHApiError(
+          `Request to ${endpoint} failed: ${error.message}`,
+        );
       }
       throw error;
     }
@@ -246,7 +266,10 @@ export class BGHClient {
   private extractJson(response: AxiosResponse, context: string): JsonObject {
     const { data } = response;
     if (data === null || data === undefined || typeof data !== "object") {
-      throw new BGHApiError(`Unable to parse ${context} response as JSON`, response);
+      throw new BGHApiError(
+        `Unable to parse ${context} response as JSON`,
+        response,
+      );
     }
     return data as JsonObject;
   }
@@ -275,7 +298,8 @@ export class BGHClient {
 
   private parseDevices(data: JsonObject): DeviceStatusMap {
     const endpoints = (data.Endpoints as RawEndpoint[] | undefined) ?? [];
-    const endpointValues = (data.EndpointValues as RawEndpointValueGroup[] | undefined) ?? [];
+    const endpointValues =
+      (data.EndpointValues as RawEndpointValueGroup[] | undefined) ?? [];
     const devicesMeta = (data.Devices as RawDevice[] | undefined) ?? [];
 
     const devices: DeviceStatusMap = {};
@@ -315,12 +339,17 @@ export class BGHClient {
     return devices;
   }
 
-  private normaliseValues(valuesGroup?: RawEndpointValueGroup): RawEndpointValue[] {
+  private normaliseValues(
+    valuesGroup?: RawEndpointValueGroup,
+  ): RawEndpointValue[] {
     const values = valuesGroup?.Values;
     if (!Array.isArray(values)) {
       return [];
     }
-    return values.filter((item): item is RawEndpointValue => typeof item === "object" && item !== null);
+    return values.filter(
+      (item): item is RawEndpointValue =>
+        typeof item === "object" && item !== null,
+    );
   }
 
   private parseRawValues(values: RawEndpointValue[]): {
@@ -340,7 +369,10 @@ export class BGHClient {
 
     let temperature: number | null = null;
     const temperatureValue = findValue(VALUE_TYPE_TEMPERATURE);
-    if (typeof temperatureValue === "number" || typeof temperatureValue === "string") {
+    if (
+      typeof temperatureValue === "number" ||
+      typeof temperatureValue === "string"
+    ) {
       const numericTemperature = Number(temperatureValue);
       if (!Number.isNaN(numericTemperature)) {
         temperature = numericTemperature <= -50 ? null : numericTemperature;
@@ -349,16 +381,23 @@ export class BGHClient {
 
     let targetTemperature: number | null = null;
     const targetTemperatureValue = findValue(VALUE_TYPE_TARGET_TEMPERATURE);
-    if (typeof targetTemperatureValue === "number" || typeof targetTemperatureValue === "string") {
+    if (
+      typeof targetTemperatureValue === "number" ||
+      typeof targetTemperatureValue === "string"
+    ) {
       const numericTargetTemperature = Number(targetTemperatureValue);
       if (!Number.isNaN(numericTargetTemperature)) {
-        targetTemperature = numericTargetTemperature === 255 ? 20 : numericTargetTemperature;
+        targetTemperature =
+          numericTargetTemperature === 255 ? 20 : numericTargetTemperature;
       }
     }
 
     let fanSpeed: number | null = null;
     const fanSpeedValue = findValue(VALUE_TYPE_FAN_SPEED);
-    if (typeof fanSpeedValue === "number" || typeof fanSpeedValue === "string") {
+    if (
+      typeof fanSpeedValue === "number" ||
+      typeof fanSpeedValue === "string"
+    ) {
       const numericFanSpeed = Number(fanSpeedValue);
       fanSpeed = Number.isNaN(numericFanSpeed) ? null : numericFanSpeed;
     }
