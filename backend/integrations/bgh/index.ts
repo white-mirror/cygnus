@@ -1,4 +1,4 @@
-﻿export {
+export {
   BGHApiError,
   BGHAuthenticationError,
   BGHClient,
