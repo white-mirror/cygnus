@@ -1,4 +1,4 @@
-﻿{
+{
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
@@ -8,7 +8,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "target": "ES2020",
+    "lib": [
+      "ES2020"
+    ]
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts"
+  ]
 }
