@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import "./App.css";
 
 type PingPayload =
@@ -76,3 +76,4 @@ function App(): JSX.Element {
 }
 
 export default App;
+
