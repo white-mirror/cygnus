@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `backend/` – Express API (source in `src/`, integrations in `integraciones/`, build output in `dist/`).
+- `backend/` – Express API (source in `src/`, integrations in `integrations/`, build output in `dist/`).
 - `frontend/` – Vite + React app; entry `src/main.tsx`, UI components live under `src/`.
 - Root `package.json` holds shared scripts; `.codex/` stores Codex CLI config. Keep backend/frontend changes scoped unless a feature spans both.
 - Put static assets in `frontend/public` and internal utilities beside their consumers.
@@ -32,4 +32,4 @@
 ## Security & Configuration Tips
 - Backend reads `PORT` and future secrets from the environment; document defaults in README or `.env.example`.
 - Update TypeScript + ESLint stacks together to keep types, lint rules, and configs in sync.
-- Never commit credentials; store integration notes under `backend/integraciones/<vendor>/README.md` when needed.
+- Never commit credentials; store integration notes under `backend/integrations/<vendor>/README.md` when needed.
