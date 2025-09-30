@@ -4,6 +4,7 @@
   BGHClient,
   type BGHClientOptions,
   type DeviceStatusMap,
+  type HomeSummary,
   DeviceStatus,
   FAN_MODES,
   HVAC_MODES,
