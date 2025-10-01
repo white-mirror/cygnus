@@ -1,4 +1,5 @@
-﻿import express, {
+import "dotenv/config";
+import express, {
   type NextFunction,
   type Request,
   type Response,
