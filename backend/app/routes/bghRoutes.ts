@@ -4,7 +4,7 @@ import {
   listDevices,
   listHomes,
   setDeviceMode,
-} from "src/controllers/bghController";
+} from "../../src/controllers/bghController";
 
 const router = Router();
 
