@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ChangeEvent,
   type CSSProperties,
@@ -43,10 +44,16 @@ interface ControlState {
   powerOn: boolean;
 }
 
+interface StoredSelection {
+  homeId: number | null;
+  deviceId: number | null;
+}
+
 const TEMPERATURE_MIN = 16;
 const TEMPERATURE_MAX = 30;
 const TEMPERATURE_STEP = 1;
 const DEGREE = "\u00b0";
+const STORAGE_KEY = "ac-control-selection";
 
 const FAN_ID_TO_SPEED: Record<number, FanSpeed> = {
   1: "low",
@@ -85,6 +92,29 @@ const FAN_LABELS: Record<FanSpeed, string> = {
 
 const clampTemperature = (value: number): number =>
   Math.min(Math.max(value, TEMPERATURE_MIN), TEMPERATURE_MAX);
+
+const readStoredSelection = (): StoredSelection | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  try {
+    const rawValue = window.localStorage.getItem(STORAGE_KEY);
+    if (!rawValue) {
+      return null;
+    }
+    const parsed = JSON.parse(rawValue) as StoredSelection;
+    if (
+      parsed &&
+      (parsed.homeId === null || Number.isFinite(parsed.homeId)) &&
+      (parsed.deviceId === null || Number.isFinite(parsed.deviceId))
+    ) {
+      return parsed;
+    }
+    return null;
+  } catch (_error) {
+    return null;
+  }
+};
 
 const resolveMode = (modeId: number | null): Mode => {
   if (modeId !== null && MODE_ID_TO_MODE[modeId]) {
@@ -351,24 +381,26 @@ const FAN_OPTIONS: FanOption[] = [
   },
 ];
 
-const ACCENT_BY_MODE: Record<Exclude<Mode, "off">, string> = {
-  cool: "43, 139, 255",
-  heat: "255, 120, 71",
-  auto: "60, 184, 120",
+const formatHomeName = (home: HomeSummary): string => {
+  const description =
+    typeof home.Description === "string" && home.Description.trim().length > 0
+      ? home.Description.trim()
+      : null;
+  if (description) {
+    return description;
+  }
+  if (typeof home.Name === "string" && home.Name.trim().length > 0) {
+    return home.Name.trim();
+  }
+  return `Home ${home.HomeID}`;
 };
 
-function formatHomeName(home: HomeSummary): string {
-  const name =
-    typeof home.Name === "string" && home.Name.trim().length > 0
-      ? home.Name.trim()
-      : `Home ${home.HomeID}`;
-  return name;
-}
-
-function normaliseDevice(device: DeviceStatusDTO): {
+const normaliseDevice = (
+  device: DeviceStatusDTO,
+): {
   control: ControlState;
   temperature: number | null;
-} {
+} => {
   const mode = resolveMode(device.modeId ?? null);
   const fanSpeed = resolveFanSpeed(device.fanSpeed ?? null);
   const targetTemperature = clampTemperature(
@@ -388,14 +420,21 @@ function normaliseDevice(device: DeviceStatusDTO): {
     },
     temperature,
   };
-}
+};
 
 function App(): JSX.Element {
+  const selectionRef = useRef<StoredSelection | null>(readStoredSelection());
+
   const [homes, setHomes] = useState<HomeSummary[]>([]);
   const [devices, setDevices] = useState<DeviceStatusDTO[]>([]);
-  const [selectedHomeId, setSelectedHomeId] = useState<number | null>(null);
-  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
+  const [selectedHomeId, setSelectedHomeId] = useState<number | null>(
+    selectionRef.current?.homeId ?? null,
+  );
+  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(
+    selectionRef.current?.deviceId ?? null,
+  );
   const [controlState, setControlState] = useState<ControlState | null>(null);
+  const [baselineState, setBaselineState] = useState<ControlState | null>(null);
   const [liveTemperature, setLiveTemperature] = useState<number | null>(null);
   const [lastActiveMode, setLastActiveMode] =
     useState<Exclude<Mode, "off">>("cool");
@@ -404,6 +443,21 @@ function App(): JSX.Element {
   const [isFetchingHomes, setIsFetchingHomes] = useState<boolean>(false);
   const [isFetchingDevices, setIsFetchingDevices] = useState<boolean>(false);
   const [isUpdatingDevice, setIsUpdatingDevice] = useState<boolean>(false);
+
+  const persistSelection = (
+    homeId: number | null,
+    deviceId: number | null,
+  ): void => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const payload: StoredSelection = {
+      homeId,
+      deviceId,
+    };
+    selectionRef.current = payload;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  };
 
   const selectedHome = useMemo(
     () => homes.find((home) => home.HomeID === selectedHomeId) ?? null,
@@ -436,8 +490,22 @@ function App(): JSX.Element {
           return;
         }
         setHomes(result);
-        if (result.length > 0) {
-          setSelectedHomeId((current) => current ?? result[0].HomeID);
+        if (result.length === 0) {
+          setSelectedHomeId(null);
+          setSelectedDeviceId(null);
+          persistSelection(null, null);
+          return;
+        }
+        const storedHomeId = selectionRef.current?.homeId ?? null;
+        if (
+          storedHomeId &&
+          result.some((home) => home.HomeID === storedHomeId)
+        ) {
+          setSelectedHomeId(storedHomeId);
+        } else {
+          const fallbackHomeId = result[0].HomeID;
+          setSelectedHomeId(fallbackHomeId);
+          persistSelection(fallbackHomeId, null);
         }
       })
       .catch((error: unknown) => {
@@ -466,6 +534,7 @@ function App(): JSX.Element {
       setDevices([]);
       setSelectedDeviceId(null);
       setControlState(null);
+      setBaselineState(null);
       setLiveTemperature(null);
       return;
     }
@@ -474,9 +543,8 @@ function App(): JSX.Element {
     setIsFetchingDevices(true);
     setErrorMessage(null);
     setStatusMessage(null);
-    setDevices([]);
-    setSelectedDeviceId(null);
     setControlState(null);
+    setBaselineState(null);
     setLiveTemperature(null);
 
     fetchDevices(selectedHomeId)
@@ -490,12 +558,18 @@ function App(): JSX.Element {
           }),
         );
         setDevices(sorted);
-        setSelectedDeviceId((current) => {
-          if (current && sorted.some((device) => device.deviceId === current)) {
-            return current;
-          }
-          return sorted[0]?.deviceId ?? null;
-        });
+        const storedSelection = selectionRef.current;
+        const storedDeviceId =
+          storedSelection && storedSelection.homeId === selectedHomeId
+            ? storedSelection.deviceId
+            : null;
+        const nextDeviceId =
+          storedDeviceId !== null &&
+          sorted.some((device) => device.deviceId === storedDeviceId)
+            ? storedDeviceId
+            : (sorted[0]?.deviceId ?? null);
+        setSelectedDeviceId(nextDeviceId);
+        persistSelection(selectedHomeId, nextDeviceId ?? null);
       })
       .catch((error: unknown) => {
         if (!isActive) {
@@ -506,6 +580,9 @@ function App(): JSX.Element {
             ? error.message
             : "No se pudieron cargar los equipos";
         setErrorMessage(message);
+        setDevices([]);
+        setSelectedDeviceId(null);
+        persistSelection(selectedHomeId, null);
       })
       .finally(() => {
         if (isActive) {
@@ -521,12 +598,14 @@ function App(): JSX.Element {
   useEffect(() => {
     if (!selectedDevice) {
       setControlState(null);
+      setBaselineState(null);
       setLiveTemperature(null);
       return;
     }
 
     const { control, temperature } = normaliseDevice(selectedDevice);
     setControlState(control);
+    setBaselineState(control);
     setLiveTemperature(temperature);
     if (control.mode !== "off") {
       setLastActiveMode(control.mode);
@@ -534,6 +613,22 @@ function App(): JSX.Element {
   }, [selectedDevice]);
 
   const controlsDisabled = controlState === null || isUpdatingDevice;
+
+  const hasPendingChanges = useMemo(() => {
+    if (!controlState || !baselineState) {
+      return false;
+    }
+    return (
+      controlState.powerOn !== baselineState.powerOn ||
+      controlState.mode !== baselineState.mode ||
+      controlState.fanSpeed !== baselineState.fanSpeed ||
+      controlState.temperature !== baselineState.temperature
+    );
+  }, [controlState, baselineState]);
+
+  const panelClassName = hasPendingChanges
+    ? "ac-panel has-pending"
+    : "ac-panel";
 
   const temperatureTrend = useMemo(() => {
     if (controlState === null) {
@@ -561,18 +656,33 @@ function App(): JSX.Element {
     }
     const parts = [selectedDevice.deviceName, MODE_LABELS[controlState.mode]];
     parts.push(`Ventilador ${FAN_LABELS[controlState.fanSpeed]}`);
+    parts.push(`Objetivo ${controlState.temperature}${DEGREE}C`);
     return parts.join(" | ");
   }, [controlState, selectedDevice]);
 
+  const effectiveStatusMessage =
+    statusMessage ??
+    (hasPendingChanges ? "Cambios pendientes sin enviar" : null);
+
   const handleHomeChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const value = event.target.value;
-    const nextHomeId = value === "" ? null : Number(value);
-    setSelectedHomeId(Number.isFinite(nextHomeId ?? NaN) ? nextHomeId : null);
+    const nextHomeIdValue = Number(event.target.value);
+    const nextHomeId = Number.isFinite(nextHomeIdValue)
+      ? nextHomeIdValue
+      : null;
+    setSelectedHomeId(nextHomeId);
+    setSelectedDeviceId(null);
+    setControlState(null);
+    setBaselineState(null);
+    setLiveTemperature(null);
+    persistSelection(nextHomeId, null);
   };
 
   const handleDeviceSelect = (deviceId: number): void => {
     setSelectedDeviceId(deviceId);
     setStatusMessage(null);
+    if (selectedHomeId !== null) {
+      persistSelection(selectedHomeId, deviceId);
+    }
   };
 
   const handlePowerToggle = (): void => {
@@ -643,6 +753,7 @@ function App(): JSX.Element {
       );
       const { control, temperature } = normaliseDevice(device);
       setControlState(control);
+      setBaselineState(control);
       setLiveTemperature(temperature);
       if (control.mode !== "off") {
         setLastActiveMode(control.mode);
@@ -657,7 +768,10 @@ function App(): JSX.Element {
   };
 
   const handleSendCommand = async (): Promise<void> => {
-    if (!controlState || selectedDeviceId === null) {
+    if (!controlState || selectedDeviceId === null || selectedHomeId === null) {
+      return;
+    }
+    if (!hasPendingChanges) {
       return;
     }
     setIsUpdatingDevice(true);
@@ -691,8 +805,12 @@ function App(): JSX.Element {
     ? controlState.temperature.toString().padStart(2, "0")
     : "--";
 
+  const sendButtonClassName = hasPendingChanges
+    ? "send-command has-pending"
+    : "send-command";
+
   return (
-    <main className="ac-panel" style={accentStyle}>
+    <main className={panelClassName} style={accentStyle}>
       <header className="panel-header">
         <div className="headline">
           <span className="panel-title">Control de clima</span>
@@ -716,11 +834,9 @@ function App(): JSX.Element {
         </button>
       </header>
 
-      <section className="panel-toolbar">
-        <div className="selector-block">
-          <label className="selector-label" htmlFor="home-select">
-            Home
-          </label>
+      <section className="home-frame">
+        <span className="home-frame-label">Home</span>
+        <div className="selector-wrapper">
           <select
             id="home-select"
             className="selector-control"
@@ -734,8 +850,19 @@ function App(): JSX.Element {
               </option>
             ))}
           </select>
+          <span className="selector-icon" aria-hidden="true">
+            &#9662;
+          </span>
         </div>
+      </section>
 
+      <section className="device-panel">
+        <div className="device-panel-header">
+          <span>Equipos</span>
+          <span className="device-count">
+            {devices.length} {devices.length === 1 ? "equipo" : "equipos"}
+          </span>
+        </div>
         <div
           className="device-selector"
           role="tablist"
@@ -748,22 +875,57 @@ function App(): JSX.Element {
             <span className="device-hint">Sin equipos disponibles</span>
           )}
           {devices.map((device) => {
+            const deviceMode = resolveMode(device.modeId ?? null);
+            const deviceFan = resolveFanSpeed(device.fanSpeed ?? null);
             const isActive = device.deviceId === selectedDeviceId;
+            const targetTemperature =
+              device.targetTemperature !== null &&
+              device.targetTemperature !== undefined
+                ? Math.round(Number(device.targetTemperature))
+                : null;
+            const currentTemp =
+              typeof device.temperature === "number"
+                ? Number(device.temperature.toFixed(1))
+                : null;
+            const buttonClassName = `device-button mode-${deviceMode}${
+              isActive ? " is-active" : ""
+            }${deviceMode === "off" ? " is-off" : ""}`;
             return (
               <button
                 key={device.deviceId}
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                className={`device-button${isActive ? " is-active" : ""}`}
+                className={buttonClassName}
                 onClick={() => handleDeviceSelect(device.deviceId)}
               >
                 <span className="device-name">{device.deviceName}</span>
-                <span className="device-meta">
-                  {typeof device.temperature === "number"
-                    ? `${device.temperature.toFixed(1)}${DEGREE}C`
-                    : "--"}
-                </span>
+                <div className="device-status-row">
+                  <span className="device-badge-group">
+                    <span className="device-badge">
+                      {deviceMode === "off" ? "Apagado" : "Encendido"}
+                    </span>
+                    <span className="device-badge">
+                      {MODE_LABELS[deviceMode]}
+                    </span>
+                  </span>
+                  {targetTemperature !== null && (
+                    <span className="device-meta">
+                      Objetivo {targetTemperature}
+                      {DEGREE}C
+                    </span>
+                  )}
+                </div>
+                <div className="device-status-row">
+                  <span className="device-meta">
+                    {currentTemp !== null
+                      ? `Actual ${currentTemp}${DEGREE}C`
+                      : "Actual --"}
+                  </span>
+                  <span className="device-meta">
+                    Ventilador {FAN_LABELS[deviceFan]}
+                  </span>
+                </div>
               </button>
             );
           })}
@@ -911,17 +1073,29 @@ function App(): JSX.Element {
         </div>
         <button
           type="button"
-          className="send-command"
+          className={sendButtonClassName}
           onClick={handleSendCommand}
-          disabled={controlsDisabled}
+          disabled={controlsDisabled || !hasPendingChanges}
         >
-          {isUpdatingDevice ? "Actualizando..." : "Enviar comando"}
+          {isUpdatingDevice
+            ? "Actualizando..."
+            : hasPendingChanges
+              ? "Enviar cambios"
+              : "Enviar comando"}
         </button>
       </footer>
 
-      {statusMessage && <div className="panel-status">{statusMessage}</div>}
+      {effectiveStatusMessage && (
+        <div className="panel-status">{effectiveStatusMessage}</div>
+      )}
     </main>
   );
 }
+
+const ACCENT_BY_MODE: Record<Exclude<Mode, "off">, string> = {
+  cool: "43, 139, 255",
+  heat: "255, 120, 71",
+  auto: "60, 184, 120",
+};
 
 export default App;
