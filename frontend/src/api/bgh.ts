@@ -1,5 +1,7 @@
 const API_BASE = "/api/bgh";
 
+type LogMeta = Record<string, unknown>;
+
 export interface HomeSummary {
   HomeID: number;
   Name?: string | null;
@@ -64,19 +66,55 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
+async function request<T>(
+  path: string,
+  init: RequestInit,
+  meta: LogMeta,
+): Promise<T> {
+  const url = `${API_BASE}${path}`;
+  console.info("[api:bgh] request:start", { url, ...meta });
+  try {
+    const response = await fetch(url, init);
+    const status = response.status;
+    console.info("[api:bgh] request:response", { url, status, ...meta });
+    try {
+      const data = await handleResponse<T>(response);
+      console.info("[api:bgh] request:success", { url, status, ...meta });
+      return data;
+    } catch (innerError) {
+      console.error("[api:bgh] request:failure", {
+        url,
+        status,
+        error: innerError,
+        ...meta,
+      });
+      throw innerError;
+    }
+  } catch (error) {
+    console.error("[api:bgh] request:error", { url, error, ...meta });
+    throw error;
+  }
+}
+
 export async function fetchHomes(): Promise<HomeSummary[]> {
-  const response = await fetch(`${API_BASE}/homes`, {
-    method: "GET",
-  });
-  const data = await handleResponse<HomesResponse>(response);
+  const data = await request<HomesResponse>(
+    "/homes",
+    {
+      method: "GET",
+    },
+    { action: "fetchHomes" },
+  );
   return Array.isArray(data.homes) ? data.homes : [];
 }
 
 export async function fetchDevices(homeId: number): Promise<DeviceStatusDTO[]> {
-  const response = await fetch(`${API_BASE}/homes/${homeId}/devices`, {
-    method: "GET",
-  });
-  const data = await handleResponse<DevicesResponse>(response);
+  const data = await request<DevicesResponse>(
+    `/homes/${homeId}/devices`,
+    {
+      method: "GET",
+    },
+    { action: "fetchDevices", homeId },
+  );
   const devicesMap = data.devices ?? {};
   return Object.values(devicesMap);
 }
@@ -85,13 +123,13 @@ export async function fetchDeviceStatus(
   homeId: number,
   deviceId: number,
 ): Promise<DeviceStatusDTO | null> {
-  const response = await fetch(
-    `${API_BASE}/homes/${homeId}/devices/${deviceId}`,
+  const data = await request<DeviceResponse>(
+    `/homes/${homeId}/devices/${deviceId}`,
     {
       method: "GET",
     },
+    { action: "fetchDeviceStatus", homeId, deviceId },
   );
-  const data = await handleResponse<DeviceResponse>(response);
   return data.device ?? null;
 }
 
@@ -99,14 +137,17 @@ export async function updateDeviceMode(
   deviceId: number,
   payload: UpdateModePayload,
 ): Promise<Record<string, unknown>> {
-  const response = await fetch(`${API_BASE}/devices/${deviceId}/mode`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const data = await request<UpdateModeResponse>(
+    `/devices/${deviceId}/mode`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+    { action: "updateDeviceMode", deviceId, payload },
+  );
 
-  const data = await handleResponse<UpdateModeResponse>(response);
   return data.result ?? {};
 }
