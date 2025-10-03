@@ -7,7 +7,6 @@ type PanelFooterProps = {
   powerOn: boolean;
   hasPendingChanges: boolean;
   controlsDisabled: boolean;
-  sendButtonSubtext: string;
   onSubmit: () => void;
 };
 
@@ -15,7 +14,6 @@ export const PanelFooter: FC<PanelFooterProps> = ({
   powerOn,
   hasPendingChanges,
   controlsDisabled,
-  sendButtonSubtext,
   onSubmit,
 }) => {
   const sendButtonClassName = hasPendingChanges
@@ -38,10 +36,7 @@ export const PanelFooter: FC<PanelFooterProps> = ({
         >
           <FontAwesomeIcon icon={faCheck} className="send-icon" />
 
-          <span className="send-label-group">
-            <span className="send-label">Enviar cambios</span>
-            <span className="send-subtext">{sendButtonSubtext}</span>
-          </span>
+          <span className="send-label">Enviar cambios</span>
         </button>
       )}
     </footer>

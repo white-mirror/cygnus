@@ -60,7 +60,6 @@ export interface ControlPanelState {
   targetTemperatureLabel: string;
   hasPendingChanges: boolean;
   controlsDisabled: boolean;
-  sendButtonSubtext: string;
 }
 
 export interface UseControlPanelResult {
@@ -361,8 +360,6 @@ export const useControlPanel = (): UseControlPanelResult => {
     ? controlState.temperature.toString().padStart(2, "0")
     : "--";
 
-  const sendButtonSubtext = statusMessage ?? "Cambios pendientes";
-
   const applyPowerCommand = useCallback(
     async (
       deviceId: number | null,
@@ -600,7 +597,6 @@ export const useControlPanel = (): UseControlPanelResult => {
     targetTemperatureLabel,
     hasPendingChanges,
     controlsDisabled,
-    sendButtonSubtext,
   };
 
   const handlers: ControlPanelHandlers = {

@@ -33,7 +33,6 @@ export const ControlPanelPage = (): JSX.Element => {
     targetTemperatureLabel,
     hasPendingChanges,
     controlsDisabled,
-    sendButtonSubtext,
     accentColor,
   } = state;
 
