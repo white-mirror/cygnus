@@ -115,20 +115,27 @@ export const useControlPanel = (): UseControlPanelResult => {
   }, [actualMode, controlState?.mode, lastActiveMode]);
 
   const updateDeviceState = useCallback(
-    async (homeId: number, deviceId: number, updatePanel: boolean) => {
+    async (
+      homeId: number,
+      deviceId: number,
+    ): Promise<DeviceStatusDTO | null> => {
       const device = await fetchDeviceStatus(homeId, deviceId);
 
       if (!device) {
-        return;
+        return null;
       }
 
-      setDevices((prev) =>
-        prev.map((item) => (item.deviceId === device.deviceId ? device : item)),
-      );
+      setDevices((prev) => {
+        const exists = prev.some((item) => item.deviceId === device.deviceId);
 
-      if (!updatePanel) {
-        return;
-      }
+        if (exists) {
+          return prev.map((item) =>
+            item.deviceId === device.deviceId ? device : item,
+          );
+        }
+
+        return [...prev, device];
+      });
 
       const { control, temperature } = normaliseDevice(device);
 
@@ -139,6 +146,8 @@ export const useControlPanel = (): UseControlPanelResult => {
       if (control.mode !== "off") {
         setLastActiveMode(control.mode);
       }
+
+      return device;
     },
     [],
   );
@@ -359,7 +368,6 @@ export const useControlPanel = (): UseControlPanelResult => {
       deviceId: number | null,
       powerOn: boolean,
       contextDevice?: DeviceStatusDTO,
-      updatePanel: boolean = true,
     ) => {
       if (selectedHomeId === null || deviceId === null) {
         return;
@@ -389,7 +397,7 @@ export const useControlPanel = (): UseControlPanelResult => {
           fan: "auto",
         });
 
-        await updateDeviceState(selectedHomeId, deviceId, updatePanel);
+        await updateDeviceState(selectedHomeId, deviceId);
         setStatusMessage(null);
       } catch (error) {
         const message =
@@ -459,7 +467,7 @@ export const useControlPanel = (): UseControlPanelResult => {
         persistSelection(selectedHomeId, device.deviceId);
       }
 
-      void applyPowerCommand(device.deviceId, nextPowerOn, device, true);
+      void applyPowerCommand(device.deviceId, nextPowerOn, device);
     },
     [
       applyPowerCommand,
@@ -532,7 +540,7 @@ export const useControlPanel = (): UseControlPanelResult => {
         fan: fanSetting,
       });
 
-      await updateDeviceState(selectedHomeId, selectedDeviceId, true);
+      await updateDeviceState(selectedHomeId, selectedDeviceId);
       setStatusMessage(null);
     } catch (error) {
       const message =
