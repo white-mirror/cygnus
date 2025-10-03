@@ -36,7 +36,7 @@ export const PanelFooter: FC<PanelFooterProps> = ({
         >
           <FontAwesomeIcon icon={faCheck} className="send-icon" />
 
-          <span className="send-label">Enviar cambios</span>
+          <span className="send-label">Confirmar</span>
         </button>
       )}
     </footer>
