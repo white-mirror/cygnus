@@ -3,7 +3,7 @@
 ## 1. Device State Update
 
 - (status: DONE) After sending a status change to a device, the on-screen state must be updated.
-- (status: TODO) Perform a `GET` request on the device after the `UPDATE` API call to refresh its state in the UI.
+- (status: DONE) Perform a `GET` request on the device after the `UPDATE` API call to refresh its state in the UI.
 
 ## 2. Button Adjustments
 

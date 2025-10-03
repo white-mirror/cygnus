@@ -397,8 +397,16 @@ export const useControlPanel = (): UseControlPanelResult => {
           fan: "auto",
         });
 
-        await updateDeviceState(selectedHomeId, deviceId);
-        setStatusMessage(null);
+        const refreshedDevice = await updateDeviceState(
+          selectedHomeId,
+          deviceId,
+        );
+
+        if (!refreshedDevice) {
+          setErrorMessage("No se pudo obtener el estado actualizado");
+        } else {
+          setStatusMessage(null);
+        }
       } catch (error) {
         const message =
           error instanceof Error
@@ -540,8 +548,16 @@ export const useControlPanel = (): UseControlPanelResult => {
         fan: fanSetting,
       });
 
-      await updateDeviceState(selectedHomeId, selectedDeviceId);
-      setStatusMessage(null);
+      const refreshedDevice = await updateDeviceState(
+        selectedHomeId,
+        selectedDeviceId,
+      );
+
+      if (!refreshedDevice) {
+        setErrorMessage("No se pudo obtener el estado actualizado");
+      } else {
+        setStatusMessage(null);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "No se pudo enviar el comando";
