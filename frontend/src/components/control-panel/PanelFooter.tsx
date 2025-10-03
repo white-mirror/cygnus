@@ -1,6 +1,7 @@
 ﻿import type { FC } from "react";
 
-import { CheckIcon } from "../icons/ClimateIcons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 type PanelFooterProps = {
   powerOn: boolean;
@@ -35,7 +36,7 @@ export const PanelFooter: FC<PanelFooterProps> = ({
           onClick={onSubmit}
           disabled={controlsDisabled || !hasPendingChanges}
         >
-          <CheckIcon className="send-icon" />
+          <FontAwesomeIcon icon={faCheck} className="send-icon" />
 
           <span className="send-label-group">
             <span className="send-label">Enviar cambios</span>

@@ -1,7 +1,8 @@
-﻿import type { FC } from "react";
+﻿import type { JSX } from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFan } from "@fortawesome/free-solid-svg-icons";
 import type { FanSpeed } from "../../features/control-panel/types";
-import { FanIcon } from "../icons/ClimateIcons";
 
 const FAN_OPTIONS: Array<{
   id: FanSpeed;
@@ -36,11 +37,11 @@ type FanSelectorProps = {
   onSelect: (fan: FanSpeed) => void;
 };
 
-export const FanSelector: FC<FanSelectorProps> = ({
+export const FanSelector = ({
   activeFanSpeed,
   controlsDisabled,
   onSelect,
-}) => (
+}: FanSelectorProps): JSX.Element => (
   <article className="control-card">
     <div className="control-card-header">
       <h2>Velocidad del Ventilador</h2>
@@ -61,7 +62,7 @@ export const FanSelector: FC<FanSelectorProps> = ({
             disabled={controlsDisabled}
           >
             <span className="fan-icon">
-              <FanIcon className="control-icon" />
+              <FontAwesomeIcon icon={faFan} className="control-icon" />
             </span>
 
             <span className="fan-copy">

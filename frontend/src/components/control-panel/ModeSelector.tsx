@@ -1,32 +1,38 @@
-﻿import type { CSSProperties, FC } from "react";
+﻿import type { CSSProperties, JSX } from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import {
+  faArrowsRotate,
+  faFire,
+  faSnowflake,
+} from "@fortawesome/free-solid-svg-icons";
 import { ACCENT_BY_MODE } from "../../features/control-panel/constants";
 import type { Mode } from "../../features/control-panel/types";
-import { AutoIcon, SnowflakeIcon, SunIcon } from "../icons/ClimateIcons";
 
 const MODE_OPTIONS: Array<{
   id: Exclude<Mode, "off">;
   label: string;
   description: string;
-  icon: FC<{ className?: string }>;
+  icon: IconDefinition;
 }> = [
   {
     id: "cool",
     label: "Frio",
     description: "Reduce la temperatura con flujo fresco",
-    icon: SnowflakeIcon,
+    icon: faSnowflake,
   },
   {
     id: "heat",
     label: "Calor",
     description: "Aumenta la temperatura de forma gradual",
-    icon: SunIcon,
+    icon: faFire,
   },
   {
     id: "auto",
     label: "Auto",
     description: "El equipo mantiene el clima automaticamente",
-    icon: AutoIcon,
+    icon: faArrowsRotate,
   },
 ];
 
@@ -36,11 +42,11 @@ type ModeSelectorProps = {
   onSelect: (mode: Exclude<Mode, "off">) => void;
 };
 
-export const ModeSelector: FC<ModeSelectorProps> = ({
+export const ModeSelector = ({
   activeMode,
   controlsDisabled,
   onSelect,
-}) => (
+}: ModeSelectorProps): JSX.Element => (
   <article className="control-card">
     <div className="control-card-header">
       <h2>Modo de Operacion</h2>
@@ -49,7 +55,6 @@ export const ModeSelector: FC<ModeSelectorProps> = ({
 
     <div className="control-options">
       {MODE_OPTIONS.map((option) => {
-        const Icon = option.icon;
         const isActive = activeMode === option.id;
         const optionStyle = {
           "--option-accent": ACCENT_BY_MODE[option.id],
@@ -66,7 +71,7 @@ export const ModeSelector: FC<ModeSelectorProps> = ({
             disabled={controlsDisabled}
           >
             <span className="mode-icon">
-              <Icon className="control-icon" />
+              <FontAwesomeIcon icon={option.icon} className="control-icon" />
             </span>
 
             <span className="mode-copy">

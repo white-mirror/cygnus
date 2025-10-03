@@ -1,7 +1,8 @@
 ﻿import type { FC } from "react";
 
 import type { DeviceStatusDTO } from "../../api/bgh";
-import { PowerIcon } from "../icons/ClimateIcons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import {
   DEGREE_SYMBOL,
   MODE_LABELS,
@@ -97,7 +98,10 @@ export const DeviceList: FC<DeviceListProps> = ({
                   }
                 }}
               >
-                <PowerIcon className="device-power-icon" />
+                <FontAwesomeIcon
+                  icon={faPowerOff}
+                  className="device-power-icon"
+                />
               </span>
             </div>
 

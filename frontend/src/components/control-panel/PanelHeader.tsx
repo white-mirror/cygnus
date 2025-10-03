@@ -1,6 +1,7 @@
 ﻿import type { FC } from "react";
 
-import { PowerIcon } from "../icons/ClimateIcons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 
 type PanelHeaderProps = {
   title: string;
@@ -30,7 +31,7 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
       onClick={onTogglePower}
       disabled={disabled}
     >
-      <PowerIcon className="power-icon" />
+      <FontAwesomeIcon icon={faPowerOff} className="power-icon" />
       <span className="power-state">{powerOn ? "Encendido" : "Apagado"}</span>
     </button>
   </header>
