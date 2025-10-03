@@ -9,7 +9,7 @@
 
 - (status: DONE) Remove the legend **"Cambios pendientes"** from the **"Enviar cambio"** button.
 - (status: DONE) Rename the **"Enviar cambios"** button label to **"Confirmar"**.
-- (status: TODO) The **"Confirmar"** button must be positioned at `bottom: 0`.
+- (status: DONE) The **"Confirmar"** button must be positioned at `bottom: 0`.
 - (status: TODO) The **"Confirmar"** button must have "sticky" behavior â€” always visible at the bottom, unless the user scrolls to its position.
 - (status: TODO) The **"Confirmar"** button must never cover or overlap components beneath it.
 - (status: TODO) On mobile: remove all border-radius from the **"Confirmar"** button.
