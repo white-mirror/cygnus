@@ -271,6 +271,59 @@ button:disabled {
   box-shadow: 0 8px 18px rgba(31, 48, 94, 0.05);
 }
 
+.device-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.device-power-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--device-accent-rgb), 0.35);
+  background: rgba(var(--device-accent-rgb), 0.12);
+  color: rgb(var(--device-accent-rgb));
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.device-power-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.device-power-toggle:focus-visible {
+  outline: 2px solid rgba(var(--device-accent-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+.device-power-toggle.is-off,
+.device-button.mode-off .device-power-toggle {
+  background: rgba(133, 148, 173, 0.18);
+  border-color: rgba(133, 148, 173, 0.4);
+  color: #526075;
+}
+
+.device-button.is-active .device-power-toggle {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+.device-power-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 .device-button:hover {
   border-color: rgba(var(--device-accent-rgb), 0.45);
   transform: translateY(-2px);
@@ -308,10 +361,13 @@ button:disabled {
   color: #ffffff;
 }
 
-.device-button.is-active .device-meta,
 .device-button.is-active .device-badge {
   color: rgba(255, 255, 255, 0.88);
   background: rgba(255, 255, 255, 0.16);
+}
+
+.device-button.is-active .device-meta {
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .device-button.mode-off .device-badge {
@@ -322,6 +378,10 @@ button:disabled {
 .device-button.mode-off.is-active .device-badge {
   background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
+}
+
+.device-button.mode-off.is-active .device-meta {
+  color: #f7f8fb;
 }
 
 .device-name {
@@ -366,16 +426,6 @@ button:disabled {
   border: 1px solid rgba(255, 120, 71, 0.28);
   padding: 0.85rem 1.1rem;
   font-weight: 600;
-}
-
-.panel-status {
-  justify-self: flex-end;
-  background: rgba(var(--accent-color), 0.12);
-  color: rgb(var(--accent-color));
-  border-radius: 999px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  font-size: 0.95rem;
 }
 
 .temperature-card {
@@ -693,30 +743,6 @@ button:disabled {
   z-index: 1;
 }
 
-.status-card {
-  min-width: 220px;
-  background: var(--surface-soft);
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  padding: 0.9rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.status-title {
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.status-text {
-  font-size: 1rem;
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
 .indicator-chip {
   display: inline-flex;
   align-items: center;
@@ -746,11 +772,16 @@ button:disabled {
 }
 
 .send-command {
-  padding: 0.65rem 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.8rem;
   border-radius: 999px;
   background: rgb(var(--accent-color));
   color: #ffffff;
   font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
   box-shadow: 0 12px 26px rgba(var(--accent-color), 0.22);
   border: none;
 }
@@ -767,6 +798,32 @@ button:disabled {
 .send-command.has-pending {
   background: rgb(var(--accent-color));
   box-shadow: 0 18px 34px rgba(var(--accent-color), 0.32);
+}
+
+.send-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.send-label-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  line-height: 1.1;
+}
+
+.send-label {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.send-subtext {
+  font-size: 0.76rem;
+  font-weight: 500;
+  opacity: 0.85;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 @keyframes pulse {
@@ -810,7 +867,6 @@ button:disabled {
     align-items: stretch;
   }
 
-  .status-card,
   .indicator-chip {
     width: 100%;
     justify-content: center;
@@ -820,6 +876,11 @@ button:disabled {
   .send-command {
     width: 100%;
     justify-content: center;
+    border-radius: 12px;
+  }
+
+  .send-label-group {
+    align-items: center;
   }
 
   .send-command.has-pending {
@@ -854,6 +915,11 @@ button:disabled {
 
   .controls-grid {
     grid-template-columns: 1fr;
+  }
+
+  .send-command {
+    border-radius: 10px;
+    padding: 0.85rem 1.4rem;
   }
 }
 
