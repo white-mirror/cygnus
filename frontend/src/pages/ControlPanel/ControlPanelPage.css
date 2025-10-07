@@ -1,7 +1,7 @@
 .ac-panel {
   position: relative;
   background: var(--surface);
-  border-radius: 28px;
+  border-radius: 0;
   box-shadow: var(--shadow-elevated);
   display: grid;
   gap: clamp(1.4rem, 3vw, 2.4rem);
@@ -756,7 +756,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.8rem;
-  border-radius: 999px;
+  border-radius: 0;
   background: rgb(var(--accent-color));
   color: #ffffff;
   font-weight: 600;
@@ -877,7 +877,7 @@
 
   .ac-panel {
     padding: 1.3rem;
-    border-radius: 22px;
+    border-radius: 0;
   }
 
   .setpoint-control {

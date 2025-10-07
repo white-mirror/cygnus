@@ -30,7 +30,7 @@
 ## 5. Mobile Layout Adjustments
 
 - (status: DONE) Remove padding from `<body>` and `<main>`.
-- (status: TODO) Remove all border-radius from `<body>`, `<main>`, and the **"Confirmar"** button.
+- (status: DONE) Remove all border-radius from `<body>`, `<main>`, and the **"Confirmar"** button.
 - (status: TODO) Change the **"Encendido/Apagado"** button:
   - It must be a round, icon-only button.
   - Position it in the top-right corner, aligned with the main title.
@@ -41,4 +41,3 @@
 - (status: TODO) Fix `.temperature-card` gradient: its `::before` element must not extend beyond the defined border-radius.
 - (status: TODO) When selecting a device that is **off**, use **dark gray** as the accent color instead of blue/orange/green.
 - (status: TODO) Remove the **"Home"** name under the **"Control de clima"** title (redundant with the **"Homes"** selector).
-
