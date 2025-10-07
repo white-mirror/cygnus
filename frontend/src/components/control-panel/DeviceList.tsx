@@ -108,18 +108,18 @@ export const DeviceList: FC<DeviceListProps> = ({
             <div className="device-status-row">
               <span className="device-badge">{MODE_LABELS[deviceMode]}</span>
 
-              {deviceTarget !== null && (
-                <span className="device-meta">
-                  Temp. Deseada {deviceTarget}
-                  {DEGREE_SYMBOL}C
-                </span>
-              )}
-            </div>
+              <div className="device-temperatures">
+                {deviceTarget !== null && (
+                  <span className="device-meta device-meta-target">
+                    Temp. Deseada {deviceTarget}
+                    {DEGREE_SYMBOL}C
+                  </span>
+                )}
 
-            <div className="device-status-row">
-              <span className="device-meta">
-                Temp. Actual {formatTemperatureWithDegree(deviceCurrent)}
-              </span>
+                <span className="device-meta device-meta-current">
+                  Temp. Actual {formatTemperatureWithDegree(deviceCurrent)}
+                </span>
+              </div>
             </div>
           </button>
         );

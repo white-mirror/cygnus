@@ -311,8 +311,8 @@
 .device-status-row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.45rem;
+  align-items: flex-start;
+  gap: 0.65rem;
 }
 
 .device-badge-group {
@@ -338,6 +338,18 @@
   color: var(--text-secondary);
   margin-left: auto;
   text-align: right;
+}
+
+.device-temperatures {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  margin-left: auto;
+}
+
+.device-temperatures .device-meta {
+  margin-left: 0;
 }
 
 .panel-error {
