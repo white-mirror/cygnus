@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   fetchDeviceStatus,
@@ -104,14 +104,12 @@ export const useControlPanel = (): UseControlPanelResult => {
     baselineState?.temperature ?? DEFAULT_TEMPERATURE;
 
   const accentColor = useMemo(() => {
-    const activeMode = controlState?.mode ?? actualMode;
-
-    if (activeMode === "off") {
+    if (actualMode === "off") {
       return ACCENT_BY_MODE[lastActiveMode];
     }
 
-    return ACCENT_BY_MODE[activeMode as Exclude<Mode, "off">];
-  }, [actualMode, controlState?.mode, lastActiveMode]);
+    return ACCENT_BY_MODE[actualMode as Exclude<Mode, "off">];
+  }, [actualMode, lastActiveMode]);
 
   const updateDeviceState = useCallback(
     async (
@@ -489,7 +487,6 @@ export const useControlPanel = (): UseControlPanelResult => {
         return prev;
       }
 
-      setLastActiveMode(mode);
       return { ...prev, mode, powerOn: true };
     });
   }, []);
@@ -613,3 +610,4 @@ export const useControlPanel = (): UseControlPanelResult => {
 
   return { state, handlers };
 };
+
