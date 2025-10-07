@@ -649,6 +649,19 @@
   background: rgba(var(--accent-color), 0.1);
   box-shadow: 0 12px 24px rgba(var(--accent-color), 0.16);
 }
+.fan-option.is-pending {
+  border-style: dashed;
+  border-color: rgba(var(--accent-color), 0.35);
+}
+
+.fan-pending {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 
 .fan-icon {
   flex-shrink: 0;
@@ -666,6 +679,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 1;
 }
 
 .fan-label {

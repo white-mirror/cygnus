@@ -1,4 +1,4 @@
-﻿import type { JSX } from "react";
+import type { JSX } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFan } from "@fortawesome/free-solid-svg-icons";
@@ -32,13 +32,15 @@ const FAN_OPTIONS: Array<{
 ];
 
 type FanSelectorProps = {
-  activeFanSpeed: FanSpeed | null;
+  actualFanSpeed: FanSpeed;
+  pendingFanSpeed: FanSpeed | null;
   controlsDisabled: boolean;
   onSelect: (fan: FanSpeed) => void;
 };
 
 export const FanSelector = ({
-  activeFanSpeed,
+  actualFanSpeed,
+  pendingFanSpeed,
   controlsDisabled,
   onSelect,
 }: FanSelectorProps): JSX.Element => (
@@ -50,13 +52,20 @@ export const FanSelector = ({
 
     <div className="fan-buttons">
       {FAN_OPTIONS.map((option) => {
-        const isActive = activeFanSpeed === option.id;
+        const isActive = actualFanSpeed === option.id;
+        const isPending =
+          pendingFanSpeed !== null &&
+          pendingFanSpeed === option.id &&
+          pendingFanSpeed !== actualFanSpeed;
+        const buttonClassName = `fan-option${isActive ? " is-active" : ""}${
+          isPending ? " is-pending" : ""
+        }`;
 
         return (
           <button
             key={option.id}
             type="button"
-            className={`fan-option${isActive ? " is-active" : ""}`}
+            className={buttonClassName}
             onClick={() => onSelect(option.id)}
             aria-pressed={isActive}
             disabled={controlsDisabled}
@@ -69,6 +78,8 @@ export const FanSelector = ({
               <span className="fan-label">{option.label}</span>
               <span className="fan-description">{option.description}</span>
             </span>
+
+            {isPending && <span className="fan-pending">Pendiente</span>}
           </button>
         );
       })}

@@ -28,6 +28,7 @@ export const ControlPanelPage = (): JSX.Element => {
     isUpdatingDevice,
     errorMessage,
     actualPowerOn,
+    actualFanSpeed,
     temperatureTrend,
     currentTemperatureLabel,
     targetTemperatureLabel,
@@ -95,7 +96,8 @@ export const ControlPanelPage = (): JSX.Element => {
         />
 
         <FanSelector
-          activeFanSpeed={controlState ? controlState.fanSpeed : null}
+          actualFanSpeed={actualFanSpeed}
+          pendingFanSpeed={controlState ? controlState.fanSpeed : null}
           controlsDisabled={controlsDisabled}
           onSelect={handlers.selectFanSpeed}
         />

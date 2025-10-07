@@ -53,6 +53,7 @@ export interface ControlPanelState {
   statusMessage: string | null;
   actualPowerOn: boolean;
   actualMode: Mode;
+  actualFanSpeed: FanSpeed;
   actualTargetTemperature: number;
   accentColor: string;
   modePreviewColor: string;
@@ -101,6 +102,7 @@ export const useControlPanel = (): UseControlPanelResult => {
 
   const actualPowerOn = baselineState?.powerOn ?? false;
   const actualMode = baselineState?.mode ?? "auto";
+  const actualFanSpeed = baselineState?.fanSpeed ?? "auto";
   const actualTargetTemperature =
     baselineState?.temperature ?? DEFAULT_TEMPERATURE;
 
@@ -598,6 +600,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     statusMessage,
     actualPowerOn,
     actualMode,
+    actualFanSpeed,
     actualTargetTemperature,
     accentColor,
     modePreviewColor,
