@@ -361,6 +361,7 @@
 .temperature-card {
   position: relative;
   border-radius: 24px;
+  overflow: hidden;
   padding: clamp(1.5rem, 4vw, 2.3rem);
   border: 1px solid var(--border-soft);
   background: linear-gradient(
@@ -377,6 +378,7 @@
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   background: radial-gradient(
     110% 110% at 85% 10%,
     rgba(var(--accent-color), 0.15),
