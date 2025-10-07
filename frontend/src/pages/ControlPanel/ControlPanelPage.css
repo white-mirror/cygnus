@@ -814,7 +814,7 @@
   .send-command {
     width: 100%;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: 0;
   }
 
   .confirm-action {
@@ -855,7 +855,7 @@
   }
 
   .send-command {
-    border-radius: 10px;
+    border-radius: 0;
     padding: 0.85rem 1.4rem;
   }
 }
