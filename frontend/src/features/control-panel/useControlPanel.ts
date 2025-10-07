@@ -10,6 +10,7 @@ import {
 } from "../../api/bgh";
 import {
   ACCENT_BY_MODE,
+  ACCENT_OFF,
   DEFAULT_TEMPERATURE,
   DEGREE_SYMBOL,
   FAN_SPEED_TO_API,
@@ -83,8 +84,6 @@ export const useControlPanel = (): UseControlPanelResult => {
   const [controlState, setControlState] = useState<ControlState | null>(null);
   const [baselineState, setBaselineState] = useState<ControlState | null>(null);
   const [liveTemperature, setLiveTemperature] = useState<number | null>(null);
-  const [lastActiveMode, setLastActiveMode] =
-    useState<Exclude<Mode, "off">>("cool");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isFetchingHomes, setIsFetchingHomes] = useState<boolean>(false);
@@ -108,21 +107,21 @@ export const useControlPanel = (): UseControlPanelResult => {
 
   const accentColor = useMemo(() => {
     if (actualMode === "off") {
-      return ACCENT_BY_MODE[lastActiveMode];
+      return ACCENT_OFF;
     }
 
     return ACCENT_BY_MODE[actualMode as Exclude<Mode, "off">];
-  }, [actualMode, lastActiveMode]);
+  }, [actualMode]);
 
   const modePreviewColor = useMemo(() => {
     const previewMode = controlState?.mode ?? actualMode;
 
     if (previewMode === "off") {
-      return ACCENT_BY_MODE[lastActiveMode];
+      return ACCENT_OFF;
     }
 
     return ACCENT_BY_MODE[previewMode as Exclude<Mode, "off">];
-  }, [actualMode, controlState?.mode, lastActiveMode]);
+  }, [actualMode, controlState?.mode]);
 
   const updateDeviceState = useCallback(
     async (
@@ -152,10 +151,6 @@ export const useControlPanel = (): UseControlPanelResult => {
       setControlState(control);
       setBaselineState(control);
       setLiveTemperature(temperature);
-
-      if (control.mode !== "off") {
-        setLastActiveMode(control.mode);
-      }
 
       return device;
     },
@@ -317,10 +312,6 @@ export const useControlPanel = (): UseControlPanelResult => {
     setControlState(control);
     setBaselineState(control);
     setLiveTemperature(temperature);
-
-    if (control.mode !== "off") {
-      setLastActiveMode(control.mode);
-    }
   }, [selectedDevice]);
 
   const controlsDisabled = controlState === null || isUpdatingDevice;

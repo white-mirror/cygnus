@@ -39,5 +39,5 @@
 
 - (status: DONE) Remove the **"Climatizando"** indicator.
 - (status: DONE) Fix `.temperature-card` gradient: its `::before` element must not extend beyond the defined border-radius.
-- (status: TODO) When selecting a device that is **off**, use **dark gray** as the accent color instead of blue/orange/green.
+- (status: DONE) When selecting a device that is **off**, use **dark gray** as the accent color instead of blue/orange/green.
 - (status: TODO) Remove the **"Home"** name under the **"Control de clima"** title (redundant with the **"Homes"** selector).

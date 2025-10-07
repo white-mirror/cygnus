@@ -50,3 +50,5 @@ export const ACCENT_BY_MODE: Record<Exclude<Mode, "off">, string> = {
   heat: "255, 120, 71",
   auto: "60, 184, 120",
 };
+
+export const ACCENT_OFF = "84, 101, 128";
