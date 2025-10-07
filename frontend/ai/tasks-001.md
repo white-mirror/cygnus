@@ -31,7 +31,7 @@
 
 - (status: DONE) Remove padding from `<body>` and `<main>`.
 - (status: DONE) Remove all border-radius from `<body>`, `<main>`, and the **"Confirmar"** button.
-- (status: TODO) Change the **"Encendido/Apagado"** button:
+- (status: DONE) Change the **"Encendido/Apagado"** button:
   - It must be a round, icon-only button.
   - Position it in the top-right corner, aligned with the main title.
 

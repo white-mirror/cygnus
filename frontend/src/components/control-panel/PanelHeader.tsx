@@ -1,4 +1,4 @@
-﻿import type { FC } from "react";
+import type { FC } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
@@ -17,22 +17,27 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
   powerOn,
   disabled,
   onTogglePower,
-}) => (
-  <header className="panel-header">
-    <div className="headline">
-      <span className="panel-title">{title}</span>
-      <span className="panel-subtitle">{subtitle}</span>
-    </div>
+}) => {
+  const powerLabel = powerOn ? "Apagar climatizador" : "Encender climatizador";
 
-    <button
-      type="button"
-      className={`power-toggle${powerOn ? " is-on" : ""}`}
-      aria-pressed={powerOn}
-      onClick={onTogglePower}
-      disabled={disabled}
-    >
-      <FontAwesomeIcon icon={faPowerOff} className="power-icon" />
-      <span className="power-state">{powerOn ? "Encendido" : "Apagado"}</span>
-    </button>
-  </header>
-);
+  return (
+    <header className="panel-header">
+      <div className="headline">
+        <span className="panel-title">{title}</span>
+        <span className="panel-subtitle">{subtitle}</span>
+      </div>
+
+      <button
+        type="button"
+        className={`power-toggle${powerOn ? " is-on" : ""}`}
+        aria-pressed={powerOn}
+        aria-label={powerLabel}
+        title={powerLabel}
+        onClick={onTogglePower}
+        disabled={disabled}
+      >
+        <FontAwesomeIcon icon={faPowerOff} className="power-icon" />
+      </button>
+    </header>
+  );
+};
