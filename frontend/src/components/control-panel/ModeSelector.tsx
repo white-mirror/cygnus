@@ -1,4 +1,4 @@
-﻿import type { CSSProperties, JSX } from "react";
+import type { CSSProperties, JSX } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -39,48 +39,56 @@ const MODE_OPTIONS: Array<{
 type ModeSelectorProps = {
   activeMode: Mode | null;
   controlsDisabled: boolean;
+  accentPreview: string;
   onSelect: (mode: Exclude<Mode, "off">) => void;
 };
 
 export const ModeSelector = ({
   activeMode,
   controlsDisabled,
+  accentPreview,
   onSelect,
-}: ModeSelectorProps): JSX.Element => (
-  <article className="control-card">
-    <div className="control-card-header">
-      <h2>Modo de Operacion</h2>
-      <span>Selecciona la forma de climatizar</span>
-    </div>
+}: ModeSelectorProps): JSX.Element => {
+  const selectorStyle = {
+    "--selector-accent": accentPreview,
+  } as CSSProperties;
 
-    <div className="control-options">
-      {MODE_OPTIONS.map((option) => {
-        const isActive = activeMode === option.id;
-        const optionStyle = {
-          "--option-accent": ACCENT_BY_MODE[option.id],
-        } as CSSProperties;
+  return (
+    <article className="control-card mode-selector-card" style={selectorStyle}>
+      <div className="control-card-header">
+        <h2>Modo de Operacion</h2>
+        <span>Selecciona la forma de climatizar</span>
+      </div>
 
-        return (
-          <button
-            key={option.id}
-            type="button"
-            className={`mode-option${isActive ? " is-active" : ""}`}
-            style={optionStyle}
-            onClick={() => onSelect(option.id)}
-            aria-pressed={isActive}
-            disabled={controlsDisabled}
-          >
-            <span className="mode-icon">
-              <FontAwesomeIcon icon={option.icon} className="control-icon" />
-            </span>
+      <div className="control-options">
+        {MODE_OPTIONS.map((option) => {
+          const isActive = activeMode === option.id;
+          const optionStyle = {
+            "--option-accent": ACCENT_BY_MODE[option.id],
+          } as CSSProperties;
 
-            <span className="mode-copy">
-              <span className="mode-label">{option.label}</span>
-              <span className="mode-description">{option.description}</span>
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  </article>
-);
+          return (
+            <button
+              key={option.id}
+              type="button"
+              className={`mode-option${isActive ? " is-active" : ""}`}
+              style={optionStyle}
+              onClick={() => onSelect(option.id)}
+              aria-pressed={isActive}
+              disabled={controlsDisabled}
+            >
+              <span className="mode-icon">
+                <FontAwesomeIcon icon={option.icon} className="control-icon" />
+              </span>
+
+              <span className="mode-copy">
+                <span className="mode-label">{option.label}</span>
+                <span className="mode-description">{option.description}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </article>
+  );
+};

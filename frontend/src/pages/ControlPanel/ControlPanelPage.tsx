@@ -1,4 +1,4 @@
-﻿import type { CSSProperties, JSX } from "react";
+import type { CSSProperties, JSX } from "react";
 
 import { DeviceList } from "../../components/control-panel/DeviceList";
 import { FanSelector } from "../../components/control-panel/FanSelector";
@@ -34,6 +34,7 @@ export const ControlPanelPage = (): JSX.Element => {
     hasPendingChanges,
     controlsDisabled,
     accentColor,
+    modePreviewColor,
   } = state;
 
   const panelClassName = hasPendingChanges
@@ -89,6 +90,7 @@ export const ControlPanelPage = (): JSX.Element => {
         <ModeSelector
           activeMode={controlState ? controlState.mode : null}
           controlsDisabled={controlsDisabled}
+          accentPreview={modePreviewColor}
           onSelect={handlers.selectMode}
         />
 

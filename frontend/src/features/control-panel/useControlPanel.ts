@@ -55,6 +55,7 @@ export interface ControlPanelState {
   actualMode: Mode;
   actualTargetTemperature: number;
   accentColor: string;
+  modePreviewColor: string;
   temperatureTrend: string;
   currentTemperatureLabel: string;
   targetTemperatureLabel: string;
@@ -110,6 +111,16 @@ export const useControlPanel = (): UseControlPanelResult => {
 
     return ACCENT_BY_MODE[actualMode as Exclude<Mode, "off">];
   }, [actualMode, lastActiveMode]);
+
+  const modePreviewColor = useMemo(() => {
+    const previewMode = controlState?.mode ?? actualMode;
+
+    if (previewMode === "off") {
+      return ACCENT_BY_MODE[lastActiveMode];
+    }
+
+    return ACCENT_BY_MODE[previewMode as Exclude<Mode, "off">];
+  }, [actualMode, controlState?.mode, lastActiveMode]);
 
   const updateDeviceState = useCallback(
     async (
@@ -589,6 +600,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     actualMode,
     actualTargetTemperature,
     accentColor,
+    modePreviewColor,
     temperatureTrend,
     currentTemperatureLabel,
     targetTemperatureLabel,
@@ -610,4 +622,3 @@ export const useControlPanel = (): UseControlPanelResult => {
 
   return { state, handlers };
 };
-

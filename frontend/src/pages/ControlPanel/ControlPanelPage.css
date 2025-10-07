@@ -552,6 +552,17 @@
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
+.mode-selector-card {
+  border-color: rgba(var(--selector-accent, var(--accent-color)), 0.28);
+}
+
+.mode-selector-card .control-card-header h2 {
+  color: rgb(var(--selector-accent, var(--accent-color)));
+}
+
+.mode-selector-card .control-card-header span {
+  color: rgba(var(--selector-accent, var(--accent-color)), 0.7);
+}
 
 .control-options {
   display: grid;

@@ -24,7 +24,7 @@
 ## 4. Operation Mode Behavior
 
 - (status: DONE) UI components should only update colors once the device state is confirmed by the API.
-- (status: TODO) The **"modo de operacion"** selector may change colors immediately.
+- (status: DONE) The **"modo de operacion"** selector may change colors immediately.
 - (status: TODO) All other UI components must wait for the updated state from the API before reflecting changes.
 
 ## 5. Mobile Layout Adjustments
