@@ -336,6 +336,8 @@
 .device-meta {
   font-size: 0.85rem;
   color: var(--text-secondary);
+  margin-left: auto;
+  text-align: right;
 }
 
 .panel-error {

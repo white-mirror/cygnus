@@ -16,7 +16,7 @@
 
 ## 3. Temperature Display
 
-- (status: TODO) In the device list, align **"Temp. Deseada..."** and **"Temp Actual..."** to the right.
+- (status: DONE) In the device list, align **"Temp. Deseada..."** and **"Temp Actual..."** to the right.
 - (status: TODO) Layout:
   - Use a flexbox row to separate **"modo"** and **temperaturas**.
   - Use a flexbox column for the temperature values.
