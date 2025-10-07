@@ -1,4 +1,4 @@
-﻿.ac-panel {
+.ac-panel {
   position: relative;
   background: var(--surface);
   border-radius: 28px;
@@ -6,7 +6,6 @@
   box-shadow: var(--shadow-elevated);
   display: grid;
   gap: clamp(1.4rem, 3vw, 2.4rem);
-  overflow: hidden;
 }
 
 .ac-panel.has-pending {
@@ -17,6 +16,7 @@
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   background: linear-gradient(
     135deg,
     rgba(var(--accent-color), 0.08),
@@ -659,6 +659,26 @@
   z-index: 1;
 }
 
+.confirm-action {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.confirm-action.has-pending {
+  position: sticky;
+  bottom: env(safe-area-inset-bottom, 0px);
+  padding-top: 0.75rem;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(
+    to top,
+    rgba(244, 247, 251, 0.95),
+    rgba(244, 247, 251, 0)
+  );
+  z-index: 5;
+}
+
 .indicator-chip {
   display: inline-flex;
   align-items: center;
@@ -719,14 +739,6 @@
 .send-icon {
   width: 1.2rem;
   height: 1.2rem;
-}
-
-.send-label-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.1rem;
-  line-height: 1.1;
 }
 
 .send-label {
@@ -795,18 +807,13 @@
     border-radius: 12px;
   }
 
-  .send-label-group {
-    align-items: center;
+  .confirm-action {
+    justify-content: center;
   }
 
-  .send-command.has-pending {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: 520px;
-    width: calc(100% - 2.4rem);
-    z-index: 10;
+  .confirm-action.has-pending {
+    padding-top: 0.5rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 

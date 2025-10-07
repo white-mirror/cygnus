@@ -27,18 +27,22 @@ export const PanelFooter: FC<PanelFooterProps> = ({
         <span>{powerOn ? "Climatizando" : "En espera"}</span>
       </div>
 
-      {hasPendingChanges && (
-        <button
-          type="button"
-          className={sendButtonClassName}
-          onClick={onSubmit}
-          disabled={controlsDisabled || !hasPendingChanges}
-        >
-          <FontAwesomeIcon icon={faCheck} className="send-icon" />
+      <div
+        className={`confirm-action${hasPendingChanges ? " has-pending" : ""}`}
+      >
+        {hasPendingChanges && (
+          <button
+            type="button"
+            className={sendButtonClassName}
+            onClick={onSubmit}
+            disabled={controlsDisabled || !hasPendingChanges}
+          >
+            <FontAwesomeIcon icon={faCheck} className="send-icon" />
 
-          <span className="send-label">Confirmar</span>
-        </button>
-      )}
+            <span className="send-label">Confirmar</span>
+          </button>
+        )}
+      </div>
     </footer>
   );
 };
