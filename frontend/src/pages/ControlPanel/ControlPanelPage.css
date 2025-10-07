@@ -691,10 +691,9 @@
 
 .panel-footer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: space-between;
+  gap: 1rem;
   z-index: 1;
 }
 
@@ -719,34 +718,6 @@
     rgba(244, 247, 251, 0)
   );
   z-index: 5;
-}
-
-.indicator-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  background: rgba(var(--accent-color), 0.14);
-  color: rgb(var(--accent-color));
-  font-weight: 600;
-}
-
-.indicator-chip.is-idle {
-  background: rgba(84, 101, 128, 0.12);
-  color: var(--text-secondary);
-}
-
-.chip-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.45);
-}
-
-.indicator-chip:not(.is-idle) .chip-dot {
-  animation: pulse 1.8s ease-in-out infinite;
 }
 
 .send-command {
@@ -843,12 +814,6 @@
   .panel-footer {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .indicator-chip {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
   }
 
   .send-command {

@@ -1,17 +1,15 @@
-﻿import type { FC } from "react";
+import type { FC } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 type PanelFooterProps = {
-  powerOn: boolean;
   hasPendingChanges: boolean;
   controlsDisabled: boolean;
   onSubmit: () => void;
 };
 
 export const PanelFooter: FC<PanelFooterProps> = ({
-  powerOn,
   hasPendingChanges,
   controlsDisabled,
   onSubmit,
@@ -26,11 +24,6 @@ export const PanelFooter: FC<PanelFooterProps> = ({
 
   return (
     <footer className={footerClassName}>
-      <div className={`indicator-chip${powerOn ? "" : " is-idle"}`}>
-        <span className="chip-dot" />
-        <span>{powerOn ? "Climatizando" : "En espera"}</span>
-      </div>
-
       <div
         className={`confirm-action${hasPendingChanges ? " has-pending" : ""}`}
       >

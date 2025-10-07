@@ -104,10 +104,8 @@ export const ControlPanelPage = (): JSX.Element => {
       </section>
 
       <PanelFooter
-        powerOn={actualPowerOn}
         hasPendingChanges={hasPendingChanges}
         controlsDisabled={controlsDisabled}
-        sendButtonSubtext={sendButtonSubtext}
         onSubmit={() => {
           void handlers.submitChanges();
         }}
