@@ -11,7 +11,7 @@
 - (status: DONE) Rename the **"Enviar cambios"** button label to **"Confirmar"**.
 - (status: DONE) The **"Confirmar"** button must be positioned at `bottom: 0`.
 - (status: DONE) The **"Confirmar"** button must have "sticky" behavior - always visible at the bottom, unless the user scrolls to its position.
-- (status: TODO) The **"Confirmar"** button must never cover or overlap components beneath it.
+- (status: DONE) The **"Confirmar"** button must never cover or overlap components beneath it.
 - (status: TODO) On mobile: remove all border-radius from the **"Confirmar"** button.
 
 ## 3. Temperature Display

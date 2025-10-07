@@ -9,7 +9,10 @@
 }
 
 .ac-panel.has-pending {
-  padding-bottom: clamp(2.8rem, 8vw, 3.6rem);
+  --confirm-action-offset: clamp(3.25rem, 9vw, 4.5rem);
+  padding-bottom: calc(
+    clamp(2.8rem, 8vw, 3.6rem) + var(--confirm-action-offset)
+  );
 }
 
 .ac-panel::after {
@@ -669,6 +672,9 @@
 .confirm-action.has-pending {
   position: sticky;
   bottom: env(safe-area-inset-bottom, 0px);
+  display: flex;
+  align-items: center;
+  min-height: var(--confirm-action-offset);
   padding-top: 0.75rem;
   padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(
@@ -782,6 +788,10 @@
 }
 
 @media (max-width: 760px) {
+  .ac-panel.has-pending {
+    --confirm-action-offset: calc(3.8rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .device-selector {
     flex-direction: column;
   }
@@ -818,6 +828,10 @@
 }
 
 @media (max-width: 540px) {
+  .ac-panel.has-pending {
+    --confirm-action-offset: calc(4.4rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .ac-panel {
     padding: 1.3rem;
     border-radius: 22px;

@@ -20,8 +20,12 @@ export const PanelFooter: FC<PanelFooterProps> = ({
     ? "send-command has-pending"
     : "send-command";
 
+  const footerClassName = hasPendingChanges
+    ? "panel-footer has-pending"
+    : "panel-footer";
+
   return (
-    <footer className="panel-footer">
+    <footer className={footerClassName}>
       <div className={`indicator-chip${powerOn ? "" : " is-idle"}`}>
         <span className="chip-dot" />
         <span>{powerOn ? "Climatizando" : "En espera"}</span>
