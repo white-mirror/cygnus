@@ -9,7 +9,6 @@ import { PanelHeader } from "../../components/control-panel/PanelHeader";
 import { TemperatureCard } from "../../components/control-panel/TemperatureCard";
 import { TEMPERATURE_STEP } from "../../features/control-panel/constants";
 import { useControlPanel } from "../../features/control-panel/useControlPanel";
-import { formatHomeName } from "../../features/control-panel/utils";
 
 import "./ControlPanelPage.css";
 
@@ -46,13 +45,13 @@ export const ControlPanelPage = (): JSX.Element => {
     "--accent-color": accentColor,
   } as CSSProperties;
 
+  const headerSubtitle = selectedHome ? undefined : "Selecciona un hogar";
+
   return (
     <main className={panelClassName} style={accentStyle}>
       <PanelHeader
         title="Control de clima"
-        subtitle={
-          selectedHome ? formatHomeName(selectedHome) : "Selecciona un hogar"
-        }
+        subtitle={headerSubtitle}
         powerOn={actualPowerOn}
         disabled={controlsDisabled}
         onTogglePower={handlers.togglePanelPower}
