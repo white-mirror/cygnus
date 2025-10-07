@@ -2,7 +2,6 @@
   position: relative;
   background: var(--surface);
   border-radius: 28px;
-  padding: clamp(1.6rem, 4vw, 2.8rem);
   box-shadow: var(--shadow-elevated);
   display: grid;
   gap: clamp(1.4rem, 3vw, 2.4rem);
@@ -814,6 +813,11 @@
   }
 }
 
+@media (min-width: 960px) {
+  .ac-panel {
+    padding: clamp(1.6rem, 4vw, 2.8rem);
+  }
+}
 @media (max-width: 860px) {
   .panel-header {
     flex-direction: column;

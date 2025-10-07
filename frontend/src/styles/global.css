@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   color-scheme: light;
   --background: #f4f7fb;
   --surface: #ffffff;
@@ -47,7 +47,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 5vw, 2.5rem);
   color: var(--text-primary);
 }
 
@@ -80,4 +79,9 @@ button:focus-visible {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+@media (min-width: 960px) {
+  body {
+    padding: clamp(1rem, 5vw, 2.5rem);
+  }
 }
