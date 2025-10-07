@@ -570,7 +570,6 @@ export const useControlPanel = (): UseControlPanelResult => {
     hasPendingChanges,
     selectedDeviceId,
     selectedHomeId,
-    updateDeviceMode,
     updateDeviceState,
   ]);
 
