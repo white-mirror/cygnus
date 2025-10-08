@@ -11,9 +11,7 @@
 
 .ac-panel.has-pending {
   --confirm-action-offset: clamp(3.25rem, 9vw, 4.5rem);
-  padding-bottom: calc(
-    clamp(2.8rem, 8vw, 3.6rem) + var(--confirm-action-offset)
-  );
+  padding-bottom: clamp(1.6rem, 4vw, 2.4rem);
 }
 
 .ac-panel::after {
@@ -821,10 +819,14 @@
 @media (max-width: 760px) {
   .ac-panel {
     min-height: 100vh;
+    padding-bottom: var(--panel-mobile-padding);
   }
 
   .ac-panel.has-pending {
     --confirm-action-offset: calc(3.8rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(
+      var(--panel-mobile-padding) + env(safe-area-inset-bottom, 0px)
+    );
   }
 
   .device-selector {
@@ -866,6 +868,7 @@
     width: 100%;
     justify-content: center;
     border-radius: 0;
+    padding: 0.95rem 0;
   }
 }
 
