@@ -35,6 +35,7 @@ export const ControlPanelPage = (): JSX.Element => {
     controlsDisabled,
     accentColor,
     modePreviewColor,
+    confirmAccentColor,
   } = state;
 
   const panelClassName = hasPendingChanges
@@ -105,6 +106,7 @@ export const ControlPanelPage = (): JSX.Element => {
       <PanelFooter
         hasPendingChanges={hasPendingChanges}
         controlsDisabled={controlsDisabled}
+        confirmAccent={confirmAccentColor}
         onSubmit={() => {
           void handlers.submitChanges();
         }}

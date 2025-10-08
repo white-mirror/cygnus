@@ -14,6 +14,11 @@
   --accent-heat: 255, 120, 71;
   --accent-auto: 60, 184, 120;
   --accent-color: var(--accent-cool);
+  --mode-cool-accent: var(--accent-cool);
+  --mode-heat-accent: var(--accent-heat);
+  --mode-fan-accent: 72, 201, 176;
+  --mode-auto-accent: var(--accent-auto);
+  --mode-off-accent: 84, 101, 128;
   font-family:
     "Inter",
     "Segoe UI",

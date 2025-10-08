@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { CSSProperties, FC } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -6,12 +6,14 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 type PanelFooterProps = {
   hasPendingChanges: boolean;
   controlsDisabled: boolean;
+  confirmAccent: string;
   onSubmit: () => void;
 };
 
 export const PanelFooter: FC<PanelFooterProps> = ({
   hasPendingChanges,
   controlsDisabled,
+  confirmAccent,
   onSubmit,
 }) => {
   const footerClassName = hasPendingChanges
@@ -22,10 +24,15 @@ export const PanelFooter: FC<PanelFooterProps> = ({
     ? "send-command has-pending"
     : "send-command";
 
+  const accentStyle = {
+    "--confirm-accent": confirmAccent,
+  } as CSSProperties;
+
   return (
     <footer
       className={footerClassName}
       data-state={hasPendingChanges ? "visible" : "hidden"}
+      style={accentStyle}
     >
       <div
         className={`confirm-action${hasPendingChanges ? " has-pending" : ""}`}

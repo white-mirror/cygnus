@@ -743,12 +743,12 @@
   gap: 0.75rem;
   padding: 0.75rem 1.8rem;
   border-radius: 0;
-  background: rgb(var(--accent-color));
+  background: rgb(var(--confirm-accent, var(--accent-color)));
   color: #ffffff;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: -0.01em;
-  box-shadow: 0 12px 26px rgba(var(--accent-color), 0.22);
+  box-shadow: 0 12px 26px rgba(var(--confirm-accent, var(--accent-color)), 0.22);
   border: none;
 }
 
@@ -756,14 +756,17 @@
   transform: translateY(-1px);
 }
 
+.send-command:focus-visible {
+  outline-color: rgb(var(--confirm-accent, var(--accent-color)));
+}
 .send-command:disabled {
-  background: rgba(var(--accent-color), 0.35);
+  background: rgba(var(--confirm-accent, var(--accent-color)), 0.35);
   box-shadow: none;
 }
 
 .send-command.has-pending {
-  background: rgb(var(--accent-color));
-  box-shadow: 0 18px 34px rgba(var(--accent-color), 0.32);
+  background: rgb(var(--confirm-accent, var(--accent-color)));
+  box-shadow: 0 18px 34px rgba(var(--confirm-accent, var(--accent-color)), 0.32);
 }
 
 .send-icon {
