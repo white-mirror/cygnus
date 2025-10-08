@@ -14,31 +14,34 @@ export const PanelFooter: FC<PanelFooterProps> = ({
   controlsDisabled,
   onSubmit,
 }) => {
-  const sendButtonClassName = hasPendingChanges
-    ? "send-command has-pending"
-    : "send-command";
-
   const footerClassName = hasPendingChanges
     ? "panel-footer has-pending"
     : "panel-footer";
 
+  const sendButtonClassName = hasPendingChanges
+    ? "send-command has-pending"
+    : "send-command";
+
   return (
-    <footer className={footerClassName}>
+    <footer
+      className={footerClassName}
+      data-state={hasPendingChanges ? "visible" : "hidden"}
+    >
       <div
         className={`confirm-action${hasPendingChanges ? " has-pending" : ""}`}
       >
-        {hasPendingChanges && (
-          <button
-            type="button"
-            className={sendButtonClassName}
-            onClick={onSubmit}
-            disabled={controlsDisabled || !hasPendingChanges}
-          >
-            <FontAwesomeIcon icon={faCheck} className="send-icon" />
+        <button
+          type="button"
+          className={sendButtonClassName}
+          onClick={onSubmit}
+          disabled={controlsDisabled || !hasPendingChanges}
+          tabIndex={hasPendingChanges ? 0 : -1}
+          aria-hidden={!hasPendingChanges}
+        >
+          <FontAwesomeIcon icon={faCheck} className="send-icon" />
 
-            <span className="send-label">Confirmar</span>
-          </button>
-        )}
+          <span className="send-label">Confirmar</span>
+        </button>
       </div>
     </footer>
   );

@@ -4,6 +4,8 @@
   border-radius: 0;
   box-shadow: var(--shadow-elevated);
   display: grid;
+  --confirm-action-offset: 0px;
+  --panel-mobile-padding: 0px;
   gap: clamp(1.4rem, 3vw, 2.4rem);
 }
 
@@ -696,30 +698,43 @@
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  z-index: 1;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.panel-footer.has-pending {
+  pointer-events: auto;
 }
 
 .confirm-action {
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   width: 100%;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(40%);
+  transition:
+    max-height 220ms ease,
+    opacity 160ms ease,
+    transform 220ms ease;
 }
 
 .confirm-action.has-pending {
-  position: sticky;
-  bottom: env(safe-area-inset-bottom, 0px);
-  display: flex;
-  align-items: center;
-  min-height: var(--confirm-action-offset);
+  max-height: var(--confirm-action-offset);
   padding-top: 0.75rem;
   padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
   background: linear-gradient(
     to top,
     rgba(244, 247, 251, 0.95),
     rgba(244, 247, 251, 0)
   );
-  z-index: 5;
 }
 
 .send-command {
@@ -801,6 +816,10 @@
 }
 
 @media (max-width: 760px) {
+  .ac-panel {
+    min-height: 100vh;
+  }
+
   .ac-panel.has-pending {
     --confirm-action-offset: calc(3.8rem + env(safe-area-inset-bottom, 0px));
   }
@@ -816,12 +835,19 @@
   .panel-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 0;
   }
 
-  .send-command {
-    width: 100%;
-    justify-content: center;
-    border-radius: 0;
+  .panel-footer.has-pending {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-left: calc(-1 * var(--panel-mobile-padding));
+    margin-right: calc(-1 * var(--panel-mobile-padding));
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    background-color: var(--surface);
   }
 
   .confirm-action {
@@ -832,6 +858,12 @@
     padding-top: 0.5rem;
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
   }
+
+  .send-command {
+    width: 100%;
+    justify-content: center;
+    border-radius: 0;
+  }
 }
 
 @media (max-width: 540px) {
@@ -840,6 +872,7 @@
   }
 
   .ac-panel {
+    --panel-mobile-padding: 1.3rem;
     padding: 1.3rem;
     border-radius: 0;
   }

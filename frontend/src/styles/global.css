@@ -85,3 +85,13 @@ button:disabled {
     padding: clamp(1rem, 5vw, 2.5rem);
   }
 }
+@media (max-width: 760px) {
+  body {
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
