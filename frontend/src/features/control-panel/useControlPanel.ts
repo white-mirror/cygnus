@@ -456,7 +456,6 @@ export const useControlPanel = (): UseControlPanelResult => {
       selectedDeviceId,
       !actualPowerOn,
       selectedDevice ?? undefined,
-      true,
     );
   }, [actualPowerOn, applyPowerCommand, selectedDevice, selectedDeviceId]);
 
