@@ -7,6 +7,7 @@ type PanelFooterProps = {
   hasPendingChanges: boolean;
   controlsDisabled: boolean;
   confirmAccent: string;
+  accentColor: string;
   onSubmit: () => void;
 };
 
@@ -14,6 +15,7 @@ export const PanelFooter: FC<PanelFooterProps> = ({
   hasPendingChanges,
   controlsDisabled,
   confirmAccent,
+  accentColor,
   onSubmit,
 }) => {
   const footerClassName = hasPendingChanges
@@ -26,6 +28,7 @@ export const PanelFooter: FC<PanelFooterProps> = ({
 
   const accentStyle = {
     "--confirm-accent": confirmAccent,
+    "--accent-color": accentColor,
   } as CSSProperties;
 
   return (
