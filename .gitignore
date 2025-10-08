@@ -33,3 +33,6 @@ Thumbs.db
 .cache/
 .parcel-cache/
 .vite/
+
+# AI Agents
+*.agents/
