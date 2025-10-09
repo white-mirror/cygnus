@@ -1,11 +1,15 @@
 .ac-panel {
+  --panel-gap: clamp(1.4rem, 3vw, 2.4rem);
+  --panel-body-padding-block: clamp(1.4rem, 4vw, 2.4rem);
+  --panel-body-padding-inline: clamp(1.4rem, 4vw, 2.4rem);
   position: relative;
   background: var(--surface);
   border-radius: 0;
   box-shadow: var(--shadow-elevated);
-  display: grid;
-  gap: clamp(1.4rem, 3vw, 2.4rem);
-  padding: clamp(1.4rem, 4vw, 2.4rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+  padding: 0;
 }
 
 .ac-panel::after {
@@ -19,6 +23,14 @@
     rgba(60, 110, 220, 0.04)
   );
   pointer-events: none;
+}
+
+.ac-panel-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--panel-gap);
+  padding: var(--panel-body-padding-block) var(--panel-body-padding-inline);
 }
 
 .ac-panel-layout {
@@ -692,12 +704,11 @@
 }
 
 .panel-footer {
-  margin-top: clamp(1.4rem, 4vw, 2rem);
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  padding: 0 clamp(1.4rem, 4vw, 2.4rem);
+  padding: 0 var(--panel-body-padding-inline) var(--panel-body-padding-inline);
   z-index: 5;
   pointer-events: none;
 }
@@ -768,6 +779,18 @@
   box-shadow: 0 18px 34px rgba(var(--confirm-accent, var(--accent-color)), 0.32);
 }
 
+@media (min-width: 761px) {
+  .send-command {
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(var(--confirm-accent, var(--accent-color)), 0.18);
+  }
+
+  .send-command.has-pending {
+    box-shadow: 0 16px 36px rgba(var(--confirm-accent, var(--accent-color)), 0.25);
+  }
+}
+
+
 .send-icon {
   width: 1.2rem;
   height: 1.2rem;
@@ -803,7 +826,9 @@
 
 @media (min-width: 960px) {
   .ac-panel {
-    padding: clamp(1.6rem, 4vw, 2.8rem);
+    --panel-gap: clamp(1.6rem, 3vw, 2.8rem);
+    --panel-body-padding-block: clamp(1.6rem, 4vw, 2.8rem);
+    --panel-body-padding-inline: clamp(1.6rem, 4vw, 2.8rem);
   }
 }
 @media (max-width: 860px) {
@@ -819,9 +844,15 @@
 
 @media (max-width: 760px) {
   .ac-panel {
+    --panel-gap: clamp(0.9rem, 4vw, 1.2rem);
+    --panel-body-padding-block: 1.2rem;
+    --panel-body-padding-inline: 1.2rem;
     min-height: 100vh;
-    padding: 1.2rem 1.2rem 1.6rem;
     border-radius: 0;
+  }
+
+  .ac-panel-body {
+    padding-bottom: clamp(1rem, 4vw, 1.4rem);
   }
 
   .device-selector {
@@ -837,7 +868,6 @@
     bottom: 0;
     left: 0;
     right: 0;
-    margin-top: clamp(1.2rem, 4vw, 1.8rem);
     padding: 0;
     background-color: var(--surface);
     box-shadow: 0 -12px 24px rgba(31, 48, 94, 0.08);
@@ -864,7 +894,8 @@
 }
 @media (max-width: 540px) {
   .ac-panel {
-    padding: 1.1rem;
+    --panel-body-padding-block: 1.1rem;
+    --panel-body-padding-inline: 1.1rem;
     border-radius: 0;
   }
 
@@ -895,3 +926,5 @@
     scroll-behavior: auto !important;
   }
 }
+
+
