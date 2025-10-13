@@ -35,6 +35,7 @@ export const ControlPanelPage = (): JSX.Element => {
     controlsDisabled,
     accentColor,
     modePreviewColor,
+    confirmAccentColor,
   } = state;
 
   const panelClassName = hasPendingChanges
@@ -48,67 +49,73 @@ export const ControlPanelPage = (): JSX.Element => {
   const headerSubtitle = selectedHome ? undefined : "Selecciona un hogar";
 
   return (
-    <main className={panelClassName} style={accentStyle}>
-      <PanelHeader
-        title="Control de clima"
-        subtitle={headerSubtitle}
-        powerOn={actualPowerOn}
-        disabled={controlsDisabled}
-        onTogglePower={handlers.togglePanelPower}
-      />
+    <div className="ac-panel-layout" style={accentStyle}>
+      <main className={panelClassName}>
+        <div className="ac-panel-body">
+          <PanelHeader
+            title="Control de clima"
+            subtitle={headerSubtitle}
+            powerOn={actualPowerOn}
+            disabled={controlsDisabled}
+            onTogglePower={handlers.togglePanelPower}
+          />
 
-      <HomeSelector
-        homes={homes}
-        selectedHomeId={selectedHomeId}
-        disabled={isFetchingHomes}
-        onSelect={handlers.selectHome}
-      />
+          <HomeSelector
+            homes={homes}
+            selectedHomeId={selectedHomeId}
+            disabled={isFetchingHomes}
+            onSelect={handlers.selectHome}
+          />
 
-      <DeviceList
-        devices={devices}
-        selectedDeviceId={selectedDeviceId}
-        isLoading={isFetchingDevices}
-        isBusy={isUpdatingDevice}
-        onSelect={handlers.selectDevice}
-        onQuickToggle={handlers.quickToggleDevicePower}
-      />
+          <DeviceList
+            devices={devices}
+            selectedDeviceId={selectedDeviceId}
+            isLoading={isFetchingDevices}
+            isBusy={isUpdatingDevice}
+            onSelect={handlers.selectDevice}
+            onQuickToggle={handlers.quickToggleDevicePower}
+          />
 
-      {errorMessage && <div className="panel-error">{errorMessage}</div>}
+          {errorMessage && <div className="panel-error">{errorMessage}</div>}
 
-      <TemperatureCard
-        currentLabel={currentTemperatureLabel}
-        targetLabel={targetTemperatureLabel}
-        temperatureValue={controlState ? controlState.temperature : null}
-        controlsDisabled={controlsDisabled}
-        temperatureTrend={temperatureTrend}
-        onIncrease={() => handlers.adjustTemperature(TEMPERATURE_STEP)}
-        onDecrease={() => handlers.adjustTemperature(-TEMPERATURE_STEP)}
-        onChange={handlers.setTemperature}
-      />
+          <TemperatureCard
+            currentLabel={currentTemperatureLabel}
+            targetLabel={targetTemperatureLabel}
+            temperatureValue={controlState ? controlState.temperature : null}
+            controlsDisabled={controlsDisabled}
+            temperatureTrend={temperatureTrend}
+            onIncrease={() => handlers.adjustTemperature(TEMPERATURE_STEP)}
+            onDecrease={() => handlers.adjustTemperature(-TEMPERATURE_STEP)}
+            onChange={handlers.setTemperature}
+          />
 
-      <section className="controls-grid">
-        <ModeSelector
-          activeMode={controlState ? controlState.mode : null}
+          <section className="controls-grid">
+            <ModeSelector
+              activeMode={controlState ? controlState.mode : null}
+              controlsDisabled={controlsDisabled}
+              accentPreview={modePreviewColor}
+              onSelect={handlers.selectMode}
+            />
+
+            <FanSelector
+              actualFanSpeed={actualFanSpeed}
+              pendingFanSpeed={controlState ? controlState.fanSpeed : null}
+              controlsDisabled={controlsDisabled}
+              onSelect={handlers.selectFanSpeed}
+            />
+          </section>
+        </div>
+
+        <PanelFooter
+          hasPendingChanges={hasPendingChanges}
           controlsDisabled={controlsDisabled}
-          accentPreview={modePreviewColor}
-          onSelect={handlers.selectMode}
+          confirmAccent={confirmAccentColor}
+          accentColor={accentColor}
+          onSubmit={() => {
+            void handlers.submitChanges();
+          }}
         />
-
-        <FanSelector
-          actualFanSpeed={actualFanSpeed}
-          pendingFanSpeed={controlState ? controlState.fanSpeed : null}
-          controlsDisabled={controlsDisabled}
-          onSelect={handlers.selectFanSpeed}
-        />
-      </section>
-
-      <PanelFooter
-        hasPendingChanges={hasPendingChanges}
-        controlsDisabled={controlsDisabled}
-        onSubmit={() => {
-          void handlers.submitChanges();
-        }}
-      />
-    </main>
+      </main>
+    </div>
   );
 };

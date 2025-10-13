@@ -1,17 +1,15 @@
 .ac-panel {
+  --panel-gap: clamp(1.4rem, 3vw, 2.4rem);
+  --panel-body-padding-block: clamp(1.4rem, 4vw, 2.4rem);
+  --panel-body-padding-inline: clamp(1.4rem, 4vw, 2.4rem);
   position: relative;
   background: var(--surface);
   border-radius: 0;
   box-shadow: var(--shadow-elevated);
-  display: grid;
-  gap: clamp(1.4rem, 3vw, 2.4rem);
-}
-
-.ac-panel.has-pending {
-  --confirm-action-offset: clamp(3.25rem, 9vw, 4.5rem);
-  padding-bottom: calc(
-    clamp(2.8rem, 8vw, 3.6rem) + var(--confirm-action-offset)
-  );
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+  padding: 0;
 }
 
 .ac-panel::after {
@@ -25,6 +23,20 @@
     rgba(60, 110, 220, 0.04)
   );
   pointer-events: none;
+}
+
+.ac-panel-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--panel-gap);
+  padding: var(--panel-body-padding-block) var(--panel-body-padding-inline);
+}
+
+.ac-panel-layout {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 3vw, 1.6rem);
 }
 
 .panel-header {
@@ -54,12 +66,12 @@
 }
 
 .power-toggle {
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: clamp(2.6rem, 8vw, 3rem);
   height: clamp(2.6rem, 8vw, 3rem);
-  padding: 0;
   border-radius: 999px;
   background: var(--surface-soft);
   border: 1px solid var(--border-soft);
@@ -696,30 +708,43 @@
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  z-index: 1;
+  padding: 0 var(--panel-body-padding-inline) var(--panel-body-padding-inline);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.panel-footer.has-pending {
+  pointer-events: auto;
 }
 
 .confirm-action {
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   width: 100%;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(40%);
+  transition:
+    max-height 220ms ease,
+    opacity 160ms ease,
+    transform 220ms ease;
 }
 
 .confirm-action.has-pending {
-  position: sticky;
-  bottom: env(safe-area-inset-bottom, 0px);
-  display: flex;
-  align-items: center;
-  min-height: var(--confirm-action-offset);
-  padding-top: 0.75rem;
-  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  max-height: 6rem;
+  padding: 0.75rem 0;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
   background: linear-gradient(
     to top,
     rgba(244, 247, 251, 0.95),
     rgba(244, 247, 251, 0)
   );
-  z-index: 5;
 }
 
 .send-command {
@@ -728,12 +753,11 @@
   gap: 0.75rem;
   padding: 0.75rem 1.8rem;
   border-radius: 0;
-  background: rgb(var(--accent-color));
+  background: rgb(var(--confirm-accent, var(--accent-color)));
   color: #ffffff;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: -0.01em;
-  box-shadow: 0 12px 26px rgba(var(--accent-color), 0.22);
   border: none;
 }
 
@@ -741,15 +765,23 @@
   transform: translateY(-1px);
 }
 
+.send-command:focus-visible {
+  outline-color: rgb(var(--confirm-accent, var(--accent-color)));
+}
 .send-command:disabled {
-  background: rgba(var(--accent-color), 0.35);
-  box-shadow: none;
+  background: rgba(var(--confirm-accent, var(--accent-color)), 0.35);
 }
 
 .send-command.has-pending {
-  background: rgb(var(--accent-color));
-  box-shadow: 0 18px 34px rgba(var(--accent-color), 0.32);
+  background: rgb(var(--confirm-accent, var(--accent-color)));
 }
+
+@media (min-width: 761px) {
+  .send-command {
+    border-radius: 999px;
+  }
+}
+
 
 .send-icon {
   width: 1.2rem;
@@ -786,7 +818,9 @@
 
 @media (min-width: 960px) {
   .ac-panel {
-    padding: clamp(1.6rem, 4vw, 2.8rem);
+    --panel-gap: clamp(1.6rem, 3vw, 2.8rem);
+    --panel-body-padding-block: clamp(1.6rem, 4vw, 2.8rem);
+    --panel-body-padding-inline: clamp(1.6rem, 4vw, 2.8rem);
   }
 }
 @media (max-width: 860px) {
@@ -801,8 +835,16 @@
 }
 
 @media (max-width: 760px) {
-  .ac-panel.has-pending {
-    --confirm-action-offset: calc(3.8rem + env(safe-area-inset-bottom, 0px));
+  .ac-panel {
+    --panel-gap: clamp(0.9rem, 4vw, 1.2rem);
+    --panel-body-padding-block: 1.2rem;
+    --panel-body-padding-inline: 1.2rem;
+    min-height: 100vh;
+    border-radius: 0;
+  }
+
+  .ac-panel-body {
+    padding-bottom: clamp(1rem, 4vw, 1.4rem);
   }
 
   .device-selector {
@@ -814,14 +856,17 @@
   }
 
   .panel-footer {
-    flex-direction: column;
-    align-items: stretch;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0;
+    background-color: var(--surface);
+    box-shadow: 0 -12px 24px rgba(31, 48, 94, 0.08);
   }
 
-  .send-command {
-    width: 100%;
-    justify-content: center;
-    border-radius: 0;
+  .panel-footer.has-pending {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .confirm-action {
@@ -829,18 +874,20 @@
   }
 
   .confirm-action.has-pending {
-    padding-top: 0.5rem;
-    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    padding: 0;
+  }
+
+  .send-command {
+    width: 100%;
+    justify-content: center;
+    border-radius: 0;
+    padding: 0.9rem 0;
   }
 }
-
 @media (max-width: 540px) {
-  .ac-panel.has-pending {
-    --confirm-action-offset: calc(4.4rem + env(safe-area-inset-bottom, 0px));
-  }
-
   .ac-panel {
-    padding: 1.3rem;
+    --panel-body-padding-block: 1.1rem;
+    --panel-body-padding-inline: 1.1rem;
     border-radius: 0;
   }
 
@@ -860,13 +907,7 @@
   .controls-grid {
     grid-template-columns: 1fr;
   }
-
-  .send-command {
-    border-radius: 0;
-    padding: 0.85rem 1.4rem;
-  }
 }
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

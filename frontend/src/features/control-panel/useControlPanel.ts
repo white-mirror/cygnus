@@ -58,6 +58,7 @@ export interface ControlPanelState {
   actualTargetTemperature: number;
   accentColor: string;
   modePreviewColor: string;
+  confirmAccentColor: string;
   temperatureTrend: string;
   currentTemperatureLabel: string;
   targetTemperatureLabel: string;
@@ -329,6 +330,29 @@ export const useControlPanel = (): UseControlPanelResult => {
     );
   }, [baselineState, controlState]);
 
+  const confirmAccentColor = useMemo(() => {
+    if (!controlState || !baselineState) {
+      return accentColor;
+    }
+
+    if (!hasPendingChanges) {
+      return accentColor;
+    }
+
+    const currentMode = baselineState.powerOn ? baselineState.mode : "off";
+    const pendingMode = controlState.powerOn ? controlState.mode : "off";
+
+    if (pendingMode === currentMode) {
+      return accentColor;
+    }
+
+    if (pendingMode === "off") {
+      return ACCENT_OFF;
+    }
+
+    return ACCENT_BY_MODE[pendingMode as Exclude<Mode, "off">];
+  }, [accentColor, baselineState, controlState, hasPendingChanges]);
+
   const temperatureTrend = useMemo(() => {
     if (!baselineState) {
       return "Selecciona un equipo";
@@ -592,6 +616,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     actualFanSpeed,
     actualTargetTemperature,
     accentColor,
+    confirmAccentColor,
     modePreviewColor,
     temperatureTrend,
     currentTemperatureLabel,
