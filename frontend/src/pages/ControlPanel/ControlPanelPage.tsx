@@ -1,4 +1,5 @@
 import type { CSSProperties, JSX } from "react";
+import { useEffect, useState } from "react";
 
 import { DeviceList } from "../../components/control-panel/DeviceList";
 import { FanSelector } from "../../components/control-panel/FanSelector";
@@ -14,6 +15,20 @@ import "./ControlPanelPage.css";
 
 export const ControlPanelPage = (): JSX.Element => {
   const { state, handlers } = useControlPanel();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const rootElement = document.documentElement;
+    rootElement.dataset.theme = theme;
+
+    return () => {
+      rootElement.dataset.theme = "light";
+    };
+  }, [theme]);
+
+  const toggleTheme = (): void => {
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
+  };
 
   const {
     homes,
@@ -37,9 +52,13 @@ export const ControlPanelPage = (): JSX.Element => {
     modePreviewColor,
   } = state;
 
-  const panelClassName = hasPendingChanges
-    ? "ac-panel has-pending"
-    : "ac-panel";
+  const panelClassName = [
+    "ac-panel",
+    hasPendingChanges ? "has-pending" : "",
+    theme === "dark" ? "theme-dark" : "theme-light",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const accentStyle = {
     "--accent-color": accentColor,
@@ -54,6 +73,8 @@ export const ControlPanelPage = (): JSX.Element => {
         subtitle={headerSubtitle}
         powerOn={actualPowerOn}
         disabled={controlsDisabled}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         onTogglePower={handlers.togglePanelPower}
       />
 

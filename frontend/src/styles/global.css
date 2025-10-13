@@ -1,4 +1,10 @@
 :root {
+  font-family:
+    "Inter",
+    "Segoe UI",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   color-scheme: light;
   --background: #f4f7fb;
   --surface: #ffffff;
@@ -14,25 +20,7 @@
   --accent-heat: 255, 120, 71;
   --accent-auto: 60, 184, 120;
   --accent-color: var(--accent-cool);
-  font-family:
-    "Inter",
-    "Segoe UI",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
-  background-color: var(--background);
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
+  --background-gradient:
     radial-gradient(
       120% 120% at 15% 10%,
       rgba(43, 139, 255, 0.12),
@@ -44,10 +32,54 @@ body {
       transparent 65%
     ),
     var(--background);
+  background-color: var(--background);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0f172a;
+  --surface: #111c2f;
+  --surface-soft: #16233b;
+  --surface-subtle: #1d2b45;
+  --border-soft: #22324d;
+  --border-strong: #30405c;
+  --text-primary: #e2e8f0;
+  --text-secondary: #cbd5f5;
+  --text-muted: #93a1c1;
+  --shadow-elevated: 0 24px 60px rgba(6, 12, 24, 0.55);
+  --background-gradient:
+    radial-gradient(
+      120% 120% at 15% 10%,
+      rgba(43, 139, 255, 0.22),
+      transparent 65%
+    ),
+    radial-gradient(
+      120% 140% at 85% 0%,
+      rgba(255, 120, 71, 0.16),
+      transparent 65%
+    ),
+    var(--background);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background-gradient);
+  background-color: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    background-image 200ms ease;
 }
 
 #root {
@@ -80,6 +112,7 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
+
 @media (min-width: 960px) {
   body {
     padding: clamp(1rem, 5vw, 2.5rem);
