@@ -4,7 +4,7 @@
 
 - `backend/` – Express API (source in `src/`, integrations in `integrations/`, build output in `dist/`).
 - `frontend/` – Vite + React app; entry `src/main.tsx`, UI components live under `src/`.
-- Root `package.json` holds shared scripts; `.codex/` stores Codex CLI config. Keep backend/frontend changes scoped unless a feature spans both.
+- Root `package.json` holds shared scripts; Codex CLI defaults live in this guide and should be copied into each contributor's `~/.codex/config.toml`. Keep backend/frontend changes scoped unless a feature spans both.
 - Put static assets in `frontend/public` and internal utilities beside their consumers.
 
 ## Build, Test, and Development Commands
@@ -77,4 +77,22 @@
   - Use `docs/CODEX_START.md` to bootstrap new agent sessions to these rules.
 - Environment Notes:
   - Windows/WSL paths differ; prefer repo-relative paths and the provided npm scripts.
-  - `.codex/` config in this repo is the source of truth for agent defaults; external user-level configs may differ.
+  - Codex CLI config: apply the `repo_no_prompts` profile (documented below) in `~/.codex/config.toml`; the former `.codex/` files are kept only as historical reference.
+
+## Codex CLI Configuration
+
+- Use the `repo_no_prompts` profile to run without approval prompts while keeping the default sandbox. Copy this snippet into your `~/.codex/config.toml` (extend existing tables if needed):
+
+```toml
+[profiles.repo_no_prompts]
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+[projects."/mnt/g/Projects/ioga"]
+profile = "repo_no_prompts"
+
+[projects.'\\?\G:\Projects\ioga']
+profile = "repo_no_prompts"
+```
+
+- If you already have project entries, just add the `profile = "repo_no_prompts"` line rather than duplicating the table.
