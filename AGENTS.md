@@ -39,3 +39,42 @@
 - Backend reads `PORT` and future secrets from the environment; document defaults in README or `.env.example`.
 - Update TypeScript + ESLint stacks together to keep types, lint rules, and configs in sync.
 - Never commit credentials; store integration notes under `backend/integrations/<vendor>/README.md` when needed.
+
+## Working Agreement for Codex
+
+- Purpose: Make agent sessions portable and consistent across local, WSL, and CI by codifying expectations inside the repo.
+- Communication:
+  - Keep messages concise and action-oriented; prefer bullets over prose.
+  - Before running multiple or long-running commands, post a one-line preamble of what you’re about to do.
+  - Ask before taking destructive actions (removing files, resetting branches) or installing dependencies.
+- Planning:
+  - Use a short plan for multi-step or ambiguous work (3–7 terse steps). Keep exactly one step in progress.
+  - Update the plan as scope changes; don’t pad trivial work with plans.
+- Execution:
+  - Default to inspecting and proposing changes; only run commands when helpful for validation.
+  - Keep changes minimal and localized; avoid unrelated refactors.
+  - Co-locate utilities with consumers; keep backend/frontend scoped unless a feature spans both.
+- Commands & Scripts:
+  - Dev servers: `npm run dev` (both), or `npm run dev --prefix backend`, `npm run dev --prefix frontend`.
+  - Builds: `npm run build --prefix backend`, `npm run build --prefix frontend`.
+  - Formatting: `npm run format` (Prettier 3 configured; two-space, double quotes, trailing commas).
+- Validation:
+  - When code changes are made, run both build commands to catch type/build issues when permitted.
+  - If tests are added, colocate them (`backend/src/__tests__`, `frontend/src/**/*.test.tsx`) and run just-affected portions first.
+  - Document any manual QA steps in PR descriptions.
+- Safety & Approvals:
+  - Always ask before: package installs, starting servers, network calls, or editing >5 files at once.
+  - Never store secrets in the repo. Use env vars; backend reads `PORT` by default.
+- Code Style:
+  - TypeScript-first; use `import type` for type-only imports.
+  - PascalCase components/classes; camelCase for variables/functions; SCREAMING_SNAKE_CASE for shared constants.
+  - Save files as UTF-8 without BOM.
+- Git & PRs:
+  - Conventional commit prefixes (`chore:`, `style:`, `feat:`). Keep commits focused.
+  - PRs should link issues, list verification commands, and include screenshots/GIFs for UI changes.
+- Documentation:
+  - Update README or feature docs when behavior or setup changes.
+  - Use `docs/CODEX_START.md` to bootstrap new agent sessions to these rules.
+- Environment Notes:
+  - Windows/WSL paths differ; prefer repo-relative paths and the provided npm scripts.
+  - `.codex/` config in this repo is the source of truth for agent defaults; external user-level configs may differ.
