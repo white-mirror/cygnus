@@ -3,6 +3,7 @@ import type { JSX } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFan } from "@fortawesome/free-solid-svg-icons";
 import type { FanSpeed } from "../../features/control-panel/types";
+import { cn } from "../../lib/cn";
 
 const FAN_OPTIONS: Array<{
   id: FanSpeed;
@@ -44,42 +45,55 @@ export const FanSelector = ({
   controlsDisabled,
   onSelect,
 }: FanSelectorProps): JSX.Element => (
-  <article className="control-card">
-    <div className="control-card-header">
-      <h2>Velocidad del Ventilador</h2>
-      <span>Configura la velocidad del ventilador</span>
+  <article className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 shadow-[0_16px_36px_rgba(31,48,94,0.12)] backdrop-blur-md sm:p-6">
+    <div className="mb-4 flex flex-col gap-1">
+      <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
+        Velocidad del Ventilador
+      </h2>
+      <span className="text-sm text-[color:var(--text-muted)]">
+        Configura la velocidad del ventilador
+      </span>
     </div>
 
-    <div className="fan-buttons">
+    <div className="grid gap-3">
       {FAN_OPTIONS.map((option) => {
         const isActive = actualFanSpeed === option.id;
         const isPending =
           pendingFanSpeed !== null &&
           pendingFanSpeed === option.id &&
           pendingFanSpeed !== actualFanSpeed;
-        const buttonClassName = `fan-option${isActive ? " is-active" : ""}${
-          isPending ? " is-pending" : ""
-        }`;
 
         return (
           <button
             key={option.id}
             type="button"
-            className={buttonClassName}
+            className={cn(
+              "flex w-full items-start gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(31,48,94,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]",
+              isActive &&
+                "border-[rgba(var(--accent-color),0.4)] bg-[rgba(var(--accent-color),0.12)] shadow-[0_24px_56px_rgba(var(--accent-color),0.24)]",
+            )}
             onClick={() => onSelect(option.id)}
             aria-pressed={isActive}
             disabled={controlsDisabled}
           >
-            <span className="fan-icon">
-              <FontAwesomeIcon icon={faFan} className="control-icon" />
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(var(--accent-color),0.16)] text-[rgb(var(--accent-color))]">
+              <FontAwesomeIcon icon={faFan} className="h-5 w-5" />
             </span>
 
-            <span className="fan-copy">
-              <span className="fan-label">{option.label}</span>
-              <span className="fan-description">{option.description}</span>
+            <span className="flex flex-1 flex-col gap-1">
+              <span className="text-sm font-semibold text-[color:var(--text-primary)]">
+                {option.label}
+              </span>
+              <span className="text-sm text-[color:var(--text-muted)]">
+                {option.description}
+              </span>
             </span>
 
-            {isPending && <span className="fan-pending">Pendiente</span>}
+            {isPending && (
+              <span className="rounded-full border border-[rgba(var(--accent-color),0.35)] bg-[rgba(var(--accent-color),0.18)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--accent-color))]">
+                Pendiente
+              </span>
+            )}
           </button>
         );
       })}

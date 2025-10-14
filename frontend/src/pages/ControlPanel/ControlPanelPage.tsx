@@ -1,5 +1,5 @@
 import type { CSSProperties, JSX } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { DeviceList } from "../../components/control-panel/DeviceList";
 import { FanSelector } from "../../components/control-panel/FanSelector";
@@ -10,8 +10,7 @@ import { PanelHeader } from "../../components/control-panel/PanelHeader";
 import { TemperatureCard } from "../../components/control-panel/TemperatureCard";
 import { TEMPERATURE_STEP } from "../../features/control-panel/constants";
 import { useControlPanel } from "../../features/control-panel/useControlPanel";
-
-import "./ControlPanelPage.css";
+import { cn } from "../../lib/cn";
 
 export const ControlPanelPage = (): JSX.Element => {
   const { state, handlers } = useControlPanel();
@@ -53,24 +52,33 @@ export const ControlPanelPage = (): JSX.Element => {
     confirmAccentColor,
   } = state;
 
-  const panelClassName = [
-    "ac-panel",
-    hasPendingChanges ? "has-pending" : "",
-    theme === "dark" ? "theme-dark" : "theme-light",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const accentStyle = useMemo(
+    () =>
+      ({
+        "--accent-color": accentColor,
+      }) as CSSProperties,
+    [accentColor],
+  );
 
-  const accentStyle = {
-    "--accent-color": accentColor,
-  } as CSSProperties;
+  const panelClassName = cn(
+    "relative isolate flex flex-col overflow-hidden rounded-[32px] border border-[color:var(--border-soft)] bg-[var(--surface)] shadow-elevated transition duration-200",
+    hasPendingChanges && "ring-2 ring-[rgba(var(--accent-color),0.35)]",
+  );
 
   const headerSubtitle = selectedHome ? undefined : "Selecciona un hogar";
 
   return (
-    <div className="ac-panel-layout" style={accentStyle}>
+    <div className="flex flex-col gap-6 lg:gap-8" style={accentStyle}>
       <main className={panelClassName}>
-        <div className="ac-panel-body">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[inherit]"
+          style={{
+            background: `linear-gradient(135deg, rgba(${accentColor}, 0.08), rgba(60, 110, 220, 0.04))`,
+          }}
+        />
+
+        <div className="relative z-10 grid gap-6 p-6 sm:gap-8 sm:p-8">
           <PanelHeader
             title="Control de clima"
             subtitle={headerSubtitle}
@@ -97,7 +105,11 @@ export const ControlPanelPage = (): JSX.Element => {
             onQuickToggle={handlers.quickToggleDevicePower}
           />
 
-          {errorMessage && <div className="panel-error">{errorMessage}</div>}
+          {errorMessage && (
+            <div className="rounded-2xl border border-red-200/60 bg-red-50/80 px-4 py-3 text-sm font-medium text-red-700">
+              {errorMessage}
+            </div>
+          )}
 
           <TemperatureCard
             currentLabel={currentTemperatureLabel}
@@ -110,7 +122,7 @@ export const ControlPanelPage = (): JSX.Element => {
             onChange={handlers.setTemperature}
           />
 
-          <section className="controls-grid">
+          <section className="grid gap-6 lg:grid-cols-2">
             <ModeSelector
               activeMode={controlState ? controlState.mode : null}
               controlsDisabled={controlsDisabled}
