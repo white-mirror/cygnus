@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import bghRoutes from "../app/routes/bghRoutes";
 import * as bghService from "../src/services/bghService";
+import * as bghAuthService from "../src/services/bghAuthService";
 import type { HomeSummary } from "../integrations/bgh";
 
 describe("BGH routes", () => {
@@ -108,4 +109,66 @@ describe("BGH routes", () => {
       flags: undefined,
     });
   });
+
+  it("validates request body when authenticating", async () => {
+    const authenticateMock = vi.spyOn(bghAuthService, "authenticate");
+
+    const response = await request(createApp())
+      .post("/api/bgh/auth/login")
+      .send({ password: "secret" })
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      code: "INVALID_BODY",
+    });
+    expect(authenticateMock).not.toHaveBeenCalled();
+
+    const responseMissingPassword = await request(createApp())
+      .post("/api/bgh/auth/login")
+      .send({ email: "user@example.com" })
+      .expect(400);
+
+    expect(responseMissingPassword.body).toMatchObject({
+      code: "INVALID_BODY",
+    });
+    expect(authenticateMock).not.toHaveBeenCalled();
+  });
+
+  it("returns token payload on successful authentication", async () => {
+    const payload = { Token: "abc", expiresIn: 3600 };
+    const authenticateMock = vi
+      .spyOn(bghAuthService, "authenticate")
+      .mockResolvedValue({ token: "abc", payload });
+
+    const response = await request(createApp())
+      .post("/api/bgh/auth/login")
+      .send({ email: " user@example.com ", password: "secret" })
+      .expect(200);
+
+    expect(response.body).toEqual({ token: "abc", payload });
+    expect(authenticateMock).toHaveBeenCalledTimes(1);
+    expect(authenticateMock).toHaveBeenCalledWith({
+      email: "user@example.com",
+      password: "secret",
+    }, expect.anything());
+  });
+
+  it("maps authentication errors to HTTP status codes", async () => {
+    const error = new bghAuthService.BGHAuthServiceError(
+      "Invalid credentials",
+      "INVALID_CREDENTIALS",
+    );
+    vi.spyOn(bghAuthService, "authenticate").mockRejectedValue(error);
+
+    const response = await request(createApp())
+      .post("/api/bgh/auth/login")
+      .send({ email: "user@example.com", password: "secret" })
+      .expect(401);
+
+    expect(response.body).toEqual({
+      code: "INVALID_CREDENTIALS",
+      message: "Invalid credentials",
+    });
+  });
+
 });

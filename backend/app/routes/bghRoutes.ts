@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  authenticate,
   getDeviceStatus,
   listDevices,
   listHomes,
@@ -8,6 +9,7 @@ import {
 
 const router = Router();
 
+router.post("/auth/login", authenticate);
 router.get("/homes", listHomes);
 router.get("/homes/:homeId/devices", listDevices);
 router.get("/homes/:homeId/devices/:deviceId", getDeviceStatus);

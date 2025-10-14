@@ -9,6 +9,11 @@ import {
   setDeviceMode as setDeviceModeService,
   type BghServiceErrorCode,
 } from "../services/bghService";
+import {
+  authenticate as authenticateService,
+  BGHAuthServiceError,
+  type BghAuthServiceErrorCode,
+} from "../services/bghAuthService";
 
 type LoggedRequest = Request & { log: Logger };
 
@@ -21,19 +26,6 @@ type Controller = (
 const getRequestLogger = (req: Request): Logger => {
   const request = req as LoggedRequest;
   return request.log ?? logger;
-};
-
-const sendServiceError = (
-  error: BGHServiceError,
-  res: Response,
-  log: Logger,
-): void => {
-  const status = mapStatus(error.code);
-  log.error({ err: error, status }, "Service error response");
-  res.status(status).json({
-    code: error.code,
-    message: error.message,
-  });
 };
 
 const mapStatus = (code: BghServiceErrorCode): number => {
@@ -51,6 +43,43 @@ const mapStatus = (code: BghServiceErrorCode): number => {
   }
 };
 
+const mapAuthStatus = (code: BghAuthServiceErrorCode): number => {
+  switch (code) {
+    case "INVALID_CREDENTIALS":
+      return 401;
+    case "UPSTREAM_ERROR":
+      return 502;
+    default:
+      return 500;
+  }
+};
+
+const sendServiceError = (
+  error: BGHServiceError,
+  res: Response,
+  log: Logger,
+): void => {
+  const status = mapStatus(error.code);
+  log.error({ err: error, status }, "Service error response");
+  res.status(status).json({
+    code: error.code,
+    message: error.message,
+  });
+};
+
+const sendAuthServiceError = (
+  error: BGHAuthServiceError,
+  res: Response,
+  log: Logger,
+): void => {
+  const status = mapAuthStatus(error.code);
+  log.error({ err: error, status }, "Auth service error response");
+  res.status(status).json({
+    code: error.code,
+    message: error.message,
+  });
+};
+
 const handleError = (
   error: unknown,
   log: Logger,
@@ -59,6 +88,10 @@ const handleError = (
 ): void => {
   if (error instanceof BGHServiceError) {
     sendServiceError(error, res, log);
+    return;
+  }
+  if (error instanceof BGHAuthServiceError) {
+    sendAuthServiceError(error, res, log);
     return;
   }
   log.error({ err: error }, "Unhandled controller error");
@@ -196,6 +229,37 @@ export const setDeviceMode: Controller = async (req, res, next) => {
     );
     log.info({ deviceId }, "Device mode updated");
     res.json({ result });
+  } catch (error) {
+    handleError(error, log, res, next);
+  }
+};
+
+export const authenticate: Controller = async (req, res, next) => {
+  const log = getRequestLogger(req).child({ route: "authenticate" });
+  const { email, password } = req.body ?? {};
+  if (typeof email !== "string" || email.trim().length === 0) {
+    const message = "Body must include a non-empty 'email' field.";
+    log.warn({ field: "email" }, message);
+    res.status(400).json({
+      code: "INVALID_BODY",
+      message,
+    });
+    return;
+  }
+
+  if (typeof password !== "string" || password.length === 0) {
+    const message = "Body must include a non-empty 'password' field.";
+    log.warn({ field: "password" }, message);
+    res.status(400).json({
+      code: "INVALID_BODY",
+      message,
+    });
+    return;
+  }
+
+  try {
+    const result = await authenticateService({ email: email.trim(), password }, log);
+    res.json({ token: result.token, payload: result.payload });
   } catch (error) {
     handleError(error, log, res, next);
   }
