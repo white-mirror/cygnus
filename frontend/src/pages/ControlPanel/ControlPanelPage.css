@@ -2,6 +2,27 @@
   --panel-gap: clamp(1.4rem, 3vw, 2.4rem);
   --panel-body-padding-block: clamp(1.4rem, 4vw, 2.4rem);
   --panel-body-padding-inline: clamp(1.4rem, 4vw, 2.4rem);
+  --panel-tile-surface: var(--surface);
+  --panel-tile-shadow: 0 8px 18px rgba(31, 48, 94, 0.05);
+  --panel-device-off-surface: #f3f6fb;
+  --panel-device-off-active-surface: #4a5568;
+  --panel-device-off-text: #526075;
+  --panel-device-off-badge-text: #566274;
+  --panel-device-off-active-meta: #f7f8fb;
+  --panel-error-bg: rgba(255, 120, 71, 0.15);
+  --panel-error-border: rgba(255, 120, 71, 0.28);
+  --panel-error-text: #a63d16;
+  --temperature-card-background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.92),
+    rgba(246, 250, 255, 0.8)
+  );
+  --panel-slider-thumb-border: #ffffff;
+  --panel-footer-gradient: linear-gradient(
+    to top,
+    rgba(244, 247, 251, 0.95),
+    rgba(244, 247, 251, 0)
+  );
   position: relative;
   background: var(--surface);
   border-radius: 0;
@@ -10,6 +31,30 @@
   flex-direction: column;
   gap: var(--panel-gap);
   padding: 0;
+}
+
+.ac-panel.theme-dark {
+  --panel-tile-surface: rgba(19, 31, 51, 0.96);
+  --panel-tile-shadow: 0 20px 40px rgba(5, 11, 26, 0.55);
+  --panel-device-off-surface: rgba(133, 148, 173, 0.18);
+  --panel-device-off-active-surface: rgba(133, 148, 173, 0.38);
+  --panel-device-off-text: #d2dcf2;
+  --panel-device-off-badge-text: #c0cbe3;
+  --panel-device-off-active-meta: #e7ecf7;
+  --panel-error-bg: rgba(255, 120, 71, 0.26);
+  --panel-error-border: rgba(255, 120, 71, 0.4);
+  --panel-error-text: #ffe3d6;
+  --temperature-card-background: linear-gradient(
+    135deg,
+    rgba(27, 40, 64, 0.94),
+    rgba(19, 30, 50, 0.88)
+  );
+  --panel-slider-thumb-border: rgba(15, 23, 42, 0.85);
+  --panel-footer-gradient: linear-gradient(
+    to top,
+    rgba(15, 23, 42, 0.95),
+    rgba(15, 23, 42, 0)
+  );
 }
 
 .ac-panel::after {
@@ -46,6 +91,57 @@
   align-items: start;
   gap: clamp(0.8rem, 2vw, 1.4rem);
   z-index: 1;
+}
+
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.4rem, 1.4vw, 0.8rem);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(2.2rem, 6vw, 2.6rem);
+  height: clamp(2.2rem, 6vw, 2.6rem);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  color: var(--text-secondary);
+  box-shadow: 0 10px 22px rgba(31, 48, 94, 0.08);
+}
+
+.theme-toggle:hover {
+  background: var(--surface-subtle);
+}
+
+.theme-toggle.is-dark {
+  background: rgba(var(--accent-auto), 0.18);
+  border-color: rgba(var(--accent-auto), 0.4);
+  color: rgb(var(--accent-auto));
+}
+
+.ac-panel.theme-dark .theme-toggle {
+  background: var(--surface-subtle);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  box-shadow: 0 12px 28px rgba(5, 11, 26, 0.45);
+}
+
+.ac-panel.theme-dark .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ac-panel.theme-dark .theme-toggle.is-dark {
+  background: rgba(var(--accent-auto), 0.32);
+  border-color: rgba(var(--accent-auto), 0.5);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.theme-icon {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .headline {
@@ -190,13 +286,13 @@
   padding: 0.8rem 1rem;
   border-radius: 18px;
   border: 1px solid var(--border-soft);
-  background: #ffffff;
+  background: var(--panel-tile-surface);
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
   min-width: min(220px, 100%);
   text-align: left;
-  box-shadow: 0 8px 18px rgba(31, 48, 94, 0.05);
+  box-shadow: var(--panel-tile-shadow);
 }
 
 .device-header {
@@ -238,7 +334,7 @@
 .device-button.mode-off .device-power-toggle {
   background: rgba(133, 148, 173, 0.18);
   border-color: rgba(133, 148, 173, 0.4);
-  color: #526075;
+  color: var(--panel-device-off-text);
 }
 
 .device-button.is-active .device-power-toggle {
@@ -271,7 +367,7 @@
 
 .device-button.mode-off {
   --device-accent-rgb: 133, 148, 173;
-  background: #f3f6fb;
+  background: var(--panel-device-off-surface);
   color: var(--text-secondary);
   border: 1px solid rgba(133, 148, 173, 0.35);
 }
@@ -284,7 +380,7 @@
 }
 
 .device-button.mode-off.is-active {
-  background: #4a5568;
+  background: var(--panel-device-off-active-surface);
   box-shadow: 0 16px 32px rgba(74, 85, 104, 0.36);
   color: #ffffff;
 }
@@ -300,7 +396,7 @@
 
 .device-button.mode-off .device-badge {
   background: rgba(133, 148, 173, 0.25);
-  color: #566274;
+  color: var(--panel-device-off-badge-text);
 }
 
 .device-button.mode-off.is-active .device-badge {
@@ -309,7 +405,7 @@
 }
 
 .device-button.mode-off.is-active .device-meta {
-  color: #f7f8fb;
+  color: var(--panel-device-off-active-meta);
 }
 
 .device-name {
@@ -362,10 +458,10 @@
 }
 
 .panel-error {
-  background: rgba(255, 120, 71, 0.15);
-  color: #a63d16;
+  background: var(--panel-error-bg);
+  color: var(--panel-error-text);
   border-radius: 16px;
-  border: 1px solid rgba(255, 120, 71, 0.28);
+  border: 1px solid var(--panel-error-border);
   padding: 0.85rem 1.1rem;
   font-weight: 600;
 }
@@ -376,11 +472,7 @@
   overflow: hidden;
   padding: clamp(1.5rem, 4vw, 2.3rem);
   border: 1px solid var(--border-soft);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.92),
-    rgba(246, 250, 255, 0.8)
-  );
+  background: var(--temperature-card-background);
   display: grid;
   gap: 1.4rem;
   z-index: 1;
@@ -522,7 +614,7 @@
   height: 20px;
   border-radius: 50%;
   background: rgb(var(--accent-color));
-  border: 3px solid #ffffff;
+  border: 3px solid var(--panel-slider-thumb-border);
   box-shadow: 0 6px 18px rgba(var(--accent-color), 0.4);
   cursor: pointer;
 }
@@ -532,7 +624,7 @@
   height: 20px;
   border-radius: 50%;
   background: rgb(var(--accent-color));
-  border: 3px solid #ffffff;
+  border: 3px solid var(--panel-slider-thumb-border);
   box-shadow: 0 6px 18px rgba(var(--accent-color), 0.4);
   cursor: pointer;
 }
@@ -586,7 +678,7 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: #ffffff;
+  background: var(--panel-tile-surface);
   border-radius: 16px;
   border: 1px solid var(--border-soft);
   text-align: left;
@@ -646,7 +738,7 @@
   gap: 0.9rem;
   padding: 0.85rem 1rem;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--panel-tile-surface);
   border: 1px solid var(--border-soft);
   text-align: left;
 }
@@ -740,11 +832,7 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-  background: linear-gradient(
-    to top,
-    rgba(244, 247, 251, 0.95),
-    rgba(244, 247, 251, 0)
-  );
+  background: var(--panel-footer-gradient);
 }
 
 .send-command {
