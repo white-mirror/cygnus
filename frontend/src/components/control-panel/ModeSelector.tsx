@@ -56,7 +56,7 @@ export const ModeSelector = ({
 
   return (
     <article
-      className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 shadow-[0_16px_36px_rgba(31,48,94,0.12)] backdrop-blur-md sm:p-6"
+      className="flex h-full w-full flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6"
       style={selectorStyle}
     >
       <div className="mb-4 flex flex-col gap-1">
@@ -80,9 +80,9 @@ export const ModeSelector = ({
               key={option.id}
               type="button"
               className={cn(
-                "flex w-full items-start gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(31,48,94,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--mode-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]",
+                "flex w-full items-start gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--mode-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transform-gpu will-change-transform",
                 isActive &&
-                  "border-[rgba(var(--mode-accent),0.45)] bg-[rgba(var(--mode-accent),0.14)] shadow-[0_24px_56px_rgba(var(--mode-accent),0.26)]",
+                  "border-[rgba(var(--mode-accent),0.45)] bg-[rgba(var(--mode-accent),0.14)]",
               )}
               style={optionStyle}
               onClick={() => onSelect(option.id)}

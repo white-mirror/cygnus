@@ -69,12 +69,14 @@
   }
 
   body {
-    @apply m-0 flex min-h-screen min-w-[320px] items-center justify-center bg-background text-[color:var(--text-primary)] transition-colors duration-200;
+    @apply m-0 min-h-screen min-w-[320px] bg-background text-[color:var(--text-primary)] transition-colors duration-200;
+    display: flex;
+    flex-direction: column;
     background-image: var(--background-gradient);
   }
 
   #root {
-    @apply w-full max-w-[960px];
+    @apply w-full flex-1;
   }
 
   a {
@@ -107,18 +109,7 @@
     font: inherit;
   }
 
-
-  @media (min-width: 960px) {
-    body {
-      padding: clamp(1rem, 5vw, 2.5rem);
-    }
-  }
-
   @media (max-width: 760px) {
-    body {
-      @apply items-start justify-start;
-    }
-
     #root {
       @apply min-h-screen;
     }

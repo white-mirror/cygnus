@@ -1,86 +1,203 @@
 import type { FC } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMoon, faPowerOff, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faMoon, faSignOut, faSun } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "../../lib/cn";
 
-type PanelHeaderProps = {
-  title: string;
-  subtitle?: string;
-  powerOn: boolean;
-  disabled: boolean;
-  theme: "light" | "dark";
-  onToggleTheme: () => void;
-  onTogglePower: () => void;
+export type PanelHeaderNavItem = {
+  id: string;
+  label: string;
 };
 
+type PanelHeaderProps = {
+  navItems: PanelHeaderNavItem[];
+  activeTab: string;
+  onSelectTab: (id: string) => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
+  userName: string;
+  userInitials: string;
+  onLogout: () => void;
+};
+
+type NavTabsProps = {
+  navItems: PanelHeaderNavItem[];
+  activeTab: string;
+  onSelectTab: (id: string) => void;
+  className?: string;
+};
+
+const NavTabs: FC<NavTabsProps> = ({
+  navItems,
+  activeTab,
+  onSelectTab,
+  className,
+}) => (
+  <nav
+    className={cn(
+      "flex shrink-0 items-center gap-2 overflow-x-auto pr-1 justify-start",
+      className,
+    )}
+    aria-label="Páginas de la aplicación"
+  >
+    {navItems.map((item) => (
+      <button
+        key={item.id}
+        type="button"
+        className={cn(
+          "rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200",
+          activeTab === item.id
+            ? "bg-[rgba(var(--accent-color),0.16)] text-[rgb(var(--accent-color))]"
+            : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]",
+        )}
+        onClick={() => onSelectTab(item.id)}
+        aria-current={activeTab === item.id ? "page" : undefined}
+      >
+        {item.label}
+      </button>
+    ))}
+  </nav>
+);
+
 export const PanelHeader: FC<PanelHeaderProps> = ({
-  title,
-  subtitle,
-  powerOn,
-  disabled,
+  navItems,
+  activeTab,
+  onSelectTab,
   theme,
   onToggleTheme,
-  onTogglePower,
+  userName,
+  userInitials,
+  onLogout,
 }) => {
-  const powerLabel = powerOn ? "Apagar climatizador" : "Encender climatizador";
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState<boolean>(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isUserMenuOpen) {
+      return;
+    }
+
+    const handleClickAway = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        event.target instanceof Node &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickAway);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickAway);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isUserMenuOpen]);
+
   const isDarkMode = theme === "dark";
   const themeLabel = isDarkMode
-    ? "Activar modo claro"
-    : "Activar modo oscuro";
+    ? "Cambiar a modo claro"
+    : "Cambiar a modo oscuro";
+  const logoutLabel = "Cerrar sesión";
 
   const actionBaseClasses =
-    "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)] text-[color:var(--text-secondary)] shadow-[0_10px_22px_rgba(31,48,94,0.08)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60";
+    "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
 
   return (
-    <header className="grid items-start gap-4 sm:grid-cols-[1fr_auto]">
-      <div className="flex flex-col gap-1.5">
-        <span className="text-2xl font-semibold leading-tight text-[color:var(--text-primary)] sm:text-[28px]">
-          {title}
-        </span>
-        {subtitle ? (
-          <span className="text-sm text-[color:var(--text-secondary)]">
-            {subtitle}
-          </span>
-        ) : null}
-      </div>
-
-      <div className="flex items-center justify-end gap-3">
-        <button
-          type="button"
-          className={cn(
-            actionBaseClasses,
-            "h-10 w-10 sm:h-11 sm:w-11",
-            isDarkMode &&
-              "border-[rgba(60,184,120,0.45)] bg-[rgba(60,184,120,0.18)] text-[rgb(60,184,120)] hover:bg-[rgba(60,184,120,0.24)]",
-          )}
-          aria-pressed={isDarkMode}
-          aria-label={themeLabel}
-          title={themeLabel}
-          onClick={onToggleTheme}
-        >
-          <FontAwesomeIcon
-            icon={isDarkMode ? faSun : faMoon}
-            className="h-5 w-5"
+    <header className="sticky top-0 z-50 border-b border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-xl">
+      <div className="flex w-full flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex w-full flex-wrap items-center gap-3">
+          <NavTabs
+            navItems={navItems}
+            activeTab={activeTab}
+            onSelectTab={onSelectTab}
+            className="flex-1 min-w-0 justify-start"
           />
-        </button>
 
-        <button
-          type="button"
-          className={cn(
-            actionBaseClasses,
-            "h-12 w-12 border-[color:var(--border-soft)] text-[color:var(--text-secondary)] shadow-[0_12px_28px_rgba(31,48,94,0.08)] sm:h-12 sm:w-12",
-            powerOn &&
-              "border-transparent bg-[rgb(var(--accent-color))] text-white shadow-[0_16px_36px_rgba(var(--accent-color),0.3)] hover:translate-y-[-1px]",
-          )}
-          aria-pressed={powerOn}
-          aria-label={powerLabel}
-          title={powerLabel}
-          onClick={onTogglePower}
-          disabled={disabled}
-        >
-          <FontAwesomeIcon icon={faPowerOff} className="h-5 w-5" />
-        </button>
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            <div ref={menuRef} className="relative">
+              <button
+                type="button"
+                className={cn(
+                  actionBaseClasses,
+                  "h-11 items-center gap-2 border-transparent bg-[var(--surface)] px-2 pl-2 pr-3 text-[color:var(--text-secondary)]",
+                )}
+                onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                aria-haspopup="menu"
+                aria-expanded={isUserMenuOpen}
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.2)] text-sm font-semibold uppercase tracking-wide text-[rgb(var(--accent-color))]">
+                  {userInitials}
+                </span>
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className={cn(
+                    "h-3 w-3 transition-transform duration-200",
+                    isUserMenuOpen && "rotate-180",
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+
+              {isUserMenuOpen && (
+                <div
+                  role="menu"
+                  aria-label="Menú de usuario"
+                  className="absolute right-0 z-10 mt-3 w-64 rounded-2xl border border-[color:var(--border-soft)] bg-[color:var(--surface)] p-3 shadow-sm"
+                >
+                  <div className="mb-2 rounded-xl bg-[var(--surface-soft)] px-3 py-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--text-muted)]">
+                      Sesión activa
+                    </p>
+                    <p className="text-sm font-semibold text-[color:var(--text-primary)]">
+                      {userName}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-[color:var(--text-secondary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface)]"
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      onToggleTheme();
+                    }}
+                    aria-label={themeLabel}
+                  >
+                    <FontAwesomeIcon
+                      icon={isDarkMode ? faSun : faMoon}
+                      className="h-4 w-4"
+                    />
+                    <span>{themeLabel}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200 focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface)]"
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      onLogout();
+                    }}
+                    aria-label={logoutLabel}
+                  >
+                    <FontAwesomeIcon icon={faSignOut} className="h-4 w-4" />
+                    <span>{logoutLabel}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );

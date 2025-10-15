@@ -23,7 +23,7 @@ export const HomeSelector: FC<HomeSelectorProps> = ({
   };
 
   return (
-    <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 shadow-[0_10px_26px_rgba(31,48,94,0.12)] backdrop-blur-sm">
+    <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 backdrop-blur-sm">
       <div className="mb-2 text-sm font-medium text-[color:var(--text-secondary)]">
         Seleccionar hogar
       </div>
@@ -31,7 +31,7 @@ export const HomeSelector: FC<HomeSelectorProps> = ({
       <div className="relative">
         <select
           id="home-select"
-          className="w-full appearance-none rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)] px-4 py-3 text-base font-medium text-[color:var(--text-primary)] shadow-[0_6px_16px_rgba(31,48,94,0.08)] outline-none transition focus:border-[rgb(var(--accent-color))] focus:ring-2 focus:ring-[rgba(var(--accent-color),0.2)]"
+          className="w-full appearance-none rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)] px-4 py-3 text-base font-medium text-[color:var(--text-primary)] outline-none transition focus:border-[rgb(var(--accent-color))] focus:ring-2 focus:ring-[rgba(var(--accent-color),0.2)]"
           value={selectedHomeId ?? ""}
           onChange={handleChange}
           disabled={disabled || homes.length === 0}

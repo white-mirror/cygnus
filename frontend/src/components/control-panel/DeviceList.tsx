@@ -20,6 +20,7 @@ type DeviceListProps = {
   isBusy: boolean;
   onSelect: (deviceId: number) => void;
   onQuickToggle: (device: DeviceStatusDTO) => void;
+  className?: string;
 };
 
 const resolveAccent = (mode: Mode): string => {
@@ -37,8 +38,14 @@ export const DeviceList: FC<DeviceListProps> = ({
   isBusy,
   onSelect,
   onQuickToggle,
+  className,
 }) => (
-  <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/70 p-4 shadow-[0_16px_36px_rgba(31,48,94,0.1)] backdrop-blur-md sm:p-6">
+  <section
+    className={cn(
+      "flex h-full min-h-0 flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/70 p-4 backdrop-blur-md sm:p-6",
+      className,
+    )}
+  >
     <div className="mb-4 flex items-baseline justify-between gap-2 text-sm">
       <span className="font-semibold text-[color:var(--text-primary)]">
         Equipos
@@ -48,20 +55,21 @@ export const DeviceList: FC<DeviceListProps> = ({
       </span>
     </div>
 
-    <div className="grid gap-3">
-      {isLoading && (
-        <span className="rounded-2xl border border-dashed border-[color:var(--border-soft)] bg-[var(--surface)] py-6 text-center text-sm text-[color:var(--text-muted)]">
-          Cargando equipos...
-        </span>
-      )}
+    <div className="flex-1 overflow-y-auto pr-1">
+      <div className="grid gap-3">
+        {isLoading && (
+          <span className="rounded-2xl border border-dashed border-[color:var(--border-soft)] bg-[var(--surface)] py-6 text-center text-sm text-[color:var(--text-muted)]">
+            Cargando equipos...
+          </span>
+        )}
 
-      {!isLoading && devices.length === 0 && (
-        <span className="rounded-2xl border border-dashed border-[color:var(--border-soft)] bg-[var(--surface)] py-6 text-center text-sm text-[color:var(--text-muted)]">
-          Sin equipos disponibles
-        </span>
-      )}
+        {!isLoading && devices.length === 0 && (
+          <span className="rounded-2xl border border-dashed border-[color:var(--border-soft)] bg-[var(--surface)] py-6 text-center text-sm text-[color:var(--text-muted)]">
+            Sin equipos disponibles
+          </span>
+        )}
 
-      {devices.map((device) => {
+        {devices.map((device) => {
         const deviceMode = resolveMode(device.modeId ?? null);
         const accent = resolveAccent(deviceMode);
         const isActive = device.deviceId === selectedDeviceId;
@@ -76,9 +84,9 @@ export const DeviceList: FC<DeviceListProps> = ({
             : null;
 
         const buttonClasses = cn(
-          "group relative flex w-full flex-col gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)]/95 p-4 text-left shadow-[0_8px_22px_rgba(31,48,94,0.08)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(31,48,94,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--device-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-soft)]",
+          "group relative flex w-full flex-col gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)]/95 p-4 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--device-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-soft)] transform-gpu will-change-transform",
           isActive &&
-            "border-[rgba(var(--device-accent),0.45)] bg-[rgba(var(--device-accent),0.12)] shadow-[0_22px_52px_rgba(var(--device-accent),0.28)]",
+            "border-[rgba(var(--device-accent),0.45)] bg-[rgba(var(--device-accent),0.12)]",
           deviceMode === "off" &&
             !isActive &&
             "bg-[rgba(84,101,128,0.08)] text-[color:var(--text-secondary)]",
@@ -154,7 +162,8 @@ export const DeviceList: FC<DeviceListProps> = ({
             </div>
           </button>
         );
-      })}
+        })}
+      </div>
     </div>
   </section>
 );

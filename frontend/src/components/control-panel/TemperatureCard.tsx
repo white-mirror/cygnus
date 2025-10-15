@@ -45,7 +45,7 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
   } as CSSProperties;
 
   return (
-    <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/85 p-4 shadow-[0_18px_48px_rgba(31,48,94,0.12)] backdrop-blur-md sm:p-6">
+    <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/85 p-4 backdrop-blur-md sm:p-6">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium uppercase tracking-wide text-[color:var(--text-muted)]">

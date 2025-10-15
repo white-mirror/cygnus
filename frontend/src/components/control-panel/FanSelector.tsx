@@ -45,7 +45,7 @@ export const FanSelector = ({
   controlsDisabled,
   onSelect,
 }: FanSelectorProps): JSX.Element => (
-  <article className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 shadow-[0_16px_36px_rgba(31,48,94,0.12)] backdrop-blur-md sm:p-6">
+  <article className="flex h-full w-full flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6">
     <div className="mb-4 flex flex-col gap-1">
       <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
         Velocidad del Ventilador
@@ -68,9 +68,9 @@ export const FanSelector = ({
             key={option.id}
             type="button"
             className={cn(
-              "flex w-full items-start gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(31,48,94,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]",
+              "flex w-full items-start gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transform-gpu will-change-transform",
               isActive &&
-                "border-[rgba(var(--accent-color),0.4)] bg-[rgba(var(--accent-color),0.12)] shadow-[0_24px_56px_rgba(var(--accent-color),0.24)]",
+                "border-[rgba(var(--accent-color),0.4)] bg-[rgba(var(--accent-color),0.12)]",
             )}
             onClick={() => onSelect(option.id)}
             aria-pressed={isActive}
