@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: "DS-Digital";
+    src: url("/fonts/DS-DIGI.TTF") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "DS-Digital";
+    src: url("/fonts/DS-DIGIB.TTF") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     color-scheme: light;
     font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -113,5 +129,17 @@
     #root {
       @apply min-h-screen;
     }
+  }
+}
+
+@layer components {
+  .digital-display {
+    font-family:
+      "DS-Digital",
+      "Orbitron",
+      "Share Tech Mono",
+      "IBM Plex Mono",
+      monospace;
+    letter-spacing: normal;
   }
 }

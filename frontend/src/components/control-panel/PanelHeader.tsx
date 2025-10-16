@@ -108,6 +108,9 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
     ? "Cambiar a modo claro"
     : "Cambiar a modo oscuro";
   const logoutLabel = "Cerrar sesión";
+  const profileMenuLabel = isUserMenuOpen
+    ? "Cerrar menú de usuario"
+    : "Abrir menú de usuario";
 
   const actionBaseClasses =
     "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
@@ -134,8 +137,10 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
                 aria-haspopup="menu"
                 aria-expanded={isUserMenuOpen}
+                aria-label={profileMenuLabel}
+                title={profileMenuLabel}
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.2)] text-sm font-semibold uppercase tracking-wide text-[rgb(var(--accent-color))]">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.2)] text-sm font-semibold tracking-wide text-[rgb(var(--accent-color))]">
                   {userInitials}
                 </span>
                 <FontAwesomeIcon
@@ -155,7 +160,7 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
                   className="absolute right-0 z-10 mt-3 w-64 rounded-2xl border border-[color:var(--border-soft)] bg-[color:var(--surface)] p-3 shadow-sm"
                 >
                   <div className="mb-2 rounded-xl bg-[var(--surface-soft)] px-3 py-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--text-muted)]">
+                    <p className="text-xs font-semibold tracking-wide text-[color:var(--text-muted)]">
                       Sesión activa
                     </p>
                     <p className="text-sm font-semibold text-[color:var(--text-primary)]">
@@ -172,10 +177,12 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
                       onToggleTheme();
                     }}
                     aria-label={themeLabel}
+                    title={themeLabel}
                   >
                     <FontAwesomeIcon
                       icon={isDarkMode ? faSun : faMoon}
                       className="h-4 w-4"
+                      aria-hidden="true"
                     />
                     <span>{themeLabel}</span>
                   </button>
@@ -189,8 +196,13 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
                       onLogout();
                     }}
                     aria-label={logoutLabel}
+                    title={logoutLabel}
                   >
-                    <FontAwesomeIcon icon={faSignOut} className="h-4 w-4" />
+                    <FontAwesomeIcon
+                      icon={faSignOut}
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
                     <span>{logoutLabel}</span>
                   </button>
                 </div>

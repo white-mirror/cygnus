@@ -70,98 +70,100 @@ export const DeviceList: FC<DeviceListProps> = ({
         )}
 
         {devices.map((device) => {
-        const deviceMode = resolveMode(device.modeId ?? null);
-        const accent = resolveAccent(deviceMode);
-        const isActive = device.deviceId === selectedDeviceId;
-        const deviceTarget =
-          device.targetTemperature !== null &&
-          device.targetTemperature !== undefined
-            ? Math.round(Number(device.targetTemperature))
-            : null;
-        const deviceCurrent =
-          typeof device.temperature === "number"
-            ? Number(device.temperature.toFixed(1))
-            : null;
+          const deviceMode = resolveMode(device.modeId ?? null);
+          const accent = resolveAccent(deviceMode);
+          const isActive = device.deviceId === selectedDeviceId;
+          const deviceTarget =
+            device.targetTemperature !== null &&
+            device.targetTemperature !== undefined
+              ? Math.round(Number(device.targetTemperature))
+              : null;
+          const deviceCurrent =
+            typeof device.temperature === "number"
+              ? Number(device.temperature.toFixed(1))
+              : null;
 
-        const buttonClasses = cn(
-          "group relative flex w-full flex-col gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)]/95 p-4 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--device-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-soft)] transform-gpu will-change-transform",
-          isActive &&
-            "border-[rgba(var(--device-accent),0.45)] bg-[rgba(var(--device-accent),0.12)]",
-          deviceMode === "off" &&
-            !isActive &&
-            "bg-[rgba(84,101,128,0.08)] text-[color:var(--text-secondary)]",
-        );
+          const buttonClasses = cn(
+            "group relative flex w-full flex-col gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)]/95 p-4 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--device-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-soft)] transform-gpu will-change-transform",
+            isActive &&
+              "border-[rgba(var(--device-accent),0.45)] bg-[rgba(var(--device-accent),0.12)]",
+            deviceMode === "off" &&
+              !isActive &&
+              "bg-[rgba(84,101,128,0.08)] text-[color:var(--text-secondary)]",
+          );
 
-        const buttonStyle = {
-          "--device-accent": accent,
-        } as CSSProperties;
+          const buttonStyle = {
+            "--device-accent": accent,
+          } as CSSProperties;
+          const quickToggleLabel =
+            deviceMode === "off" ? "Encender equipo" : "Apagar equipo";
 
-        return (
-          <button
-            key={device.deviceId}
-            type="button"
-            role="tab"
-            aria-selected={isActive}
-            className={buttonClasses}
-            style={buttonStyle}
-            onClick={() => onSelect(device.deviceId)}
-            disabled={isBusy && device.deviceId !== selectedDeviceId}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-lg font-semibold text-[color:var(--text-primary)]">
-                {device.deviceName}
-              </span>
+          return (
+            <button
+              key={device.deviceId}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              className={buttonClasses}
+              style={buttonStyle}
+              onClick={() => onSelect(device.deviceId)}
+              disabled={isBusy && device.deviceId !== selectedDeviceId}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-lg font-semibold text-[color:var(--text-primary)]">
+                  {device.deviceName}
+                </span>
 
-              <span
-                className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-full border border-transparent bg-[rgba(var(--device-accent),0.12)] text-[rgb(var(--device-accent))] transition",
-                  deviceMode === "off" &&
-                    "bg-[rgba(84,101,128,0.18)] text-[rgb(84,101,128)]",
-                )}
-                role="button"
-                tabIndex={0}
-                aria-label={
-                  deviceMode === "off" ? "Encender equipo" : "Apagar equipo"
-                }
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onQuickToggle(device);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
+                <span
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-full border border-transparent bg-[rgba(var(--device-accent),0.12)] text-[rgb(var(--device-accent))] transition",
+                    deviceMode === "off" &&
+                      "bg-[rgba(84,101,128,0.18)] text-[rgb(84,101,128)]",
+                  )}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={quickToggleLabel}
+                  title={quickToggleLabel}
+                  onClick={(event) => {
                     event.stopPropagation();
                     onQuickToggle(device);
-                  }
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={faPowerOff}
-                  className="h-4 w-4"
-                />
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--device-accent),0.4)] bg-[rgba(var(--device-accent),0.14)] px-3 py-1 font-medium text-[rgb(var(--device-accent))]">
-                {MODE_LABELS[deviceMode]}
-              </span>
-
-              <div className="flex flex-col items-end gap-1 text-xs text-[color:var(--text-muted)] sm:flex-row sm:items-center sm:gap-4">
-                {deviceTarget !== null && (
-                  <span className="font-medium text-[color:var(--text-secondary)]">
-                    Temp. Deseada {deviceTarget}
-                    {DEGREE_SYMBOL}C
-                  </span>
-                )}
-
-                <span>
-                  Temp. Actual {formatTemperatureWithDegree(deviceCurrent)}
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      onQuickToggle(device);
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faPowerOff}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  />
                 </span>
               </div>
-            </div>
-          </button>
-        );
+
+              <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--device-accent),0.4)] bg-[rgba(var(--device-accent),0.14)] px-3 py-1 font-medium text-[rgb(var(--device-accent))]">
+                  {MODE_LABELS[deviceMode]}
+                </span>
+
+                <div className="flex flex-col items-end gap-1 text-xs text-[color:var(--text-muted)] sm:flex-row sm:items-center sm:gap-4">
+                  {deviceTarget !== null && (
+                    <span className="font-medium text-[color:var(--text-secondary)]">
+                      Temp. Deseada {deviceTarget}
+                      {DEGREE_SYMBOL}C
+                    </span>
+                  )}
+
+                  <span>
+                    Temp. Actual {formatTemperatureWithDegree(deviceCurrent)}
+                  </span>
+                </div>
+              </div>
+            </button>
+          );
         })}
       </div>
     </div>

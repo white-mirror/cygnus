@@ -1,21 +1,30 @@
 import type { ChangeEvent, CSSProperties, FC } from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowDown,
+  faArrowUp,
+  faTemperatureHalf,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   DEGREE_SYMBOL,
   TEMPERATURE_MAX,
   TEMPERATURE_MIN,
   TEMPERATURE_STEP,
 } from "../../features/control-panel/constants";
+import { cn } from "../../lib/cn";
 
 type TemperatureCardProps = {
   currentLabel: string;
   targetLabel: string;
   temperatureValue: number | null;
   controlsDisabled: boolean;
-  temperatureTrend: string;
+  // temperatureTrend: string;
   onIncrease: () => void;
   onDecrease: () => void;
   onChange: (value: number) => void;
+  variant?: "card" | "section";
+  className?: string;
 };
 
 export const TemperatureCard: FC<TemperatureCardProps> = ({
@@ -23,10 +32,12 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
   targetLabel,
   temperatureValue,
   controlsDisabled,
-  temperatureTrend,
+  // temperatureTrend,
   onIncrease,
   onDecrease,
   onChange,
+  variant = "card",
+  className,
 }) => {
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = Number(event.target.value);
@@ -40,77 +51,110 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
 
   const sliderValue = temperatureValue ?? TEMPERATURE_MIN;
 
+  const ambientValue = currentLabel.includes(`${DEGREE_SYMBOL}C`)
+    ? currentLabel.replace(`${DEGREE_SYMBOL}C`, "").trim()
+    : currentLabel;
+
   const sliderStyle = {
     accentColor: `rgb(var(--accent-color))`,
   } as CSSProperties;
 
   return (
-    <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/85 p-4 backdrop-blur-md sm:p-6">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium uppercase tracking-wide text-[color:var(--text-muted)]">
-            Temperatura actual
-          </span>
-          <span className="text-3xl font-semibold text-[color:var(--text-primary)]">
-            {currentLabel}
-          </span>
+    <section
+      className={cn(
+        variant === "card" &&
+          "rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/85 backdrop-blur-md px-5 py-4 sm:px-6 sm:py-5",
+        variant === "section" && "bg-transparent",
+        className,
+      )}
+    >
+      {/* <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
+            Control
+          </h2>
+          <p className="text-xs text-[color:var(--text-muted)]">
+            Ajusta la climatización de forma precisa
+          </p>
         </div>
 
-        <div className="rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 px-4 py-2 text-sm font-medium text-[color:var(--text-secondary)]">
+        <div className="rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 px-4 py-2 text-xs font-semibold tracking-wide text-[color:var(--text-secondary)]">
           {temperatureTrend}
         </div>
-      </div>
+      </header> */}
 
-      <div
-        className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-[rgba(var(--accent-color),0.2)] bg-[rgba(var(--accent-color),0.08)] px-4 py-3 text-[color:var(--text-primary)]"
-        role="group"
-        aria-label="Ajuste de temperatura deseada"
-      >
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-white text-lg font-semibold text-[rgb(var(--accent-color))] transition hover:bg-[rgba(var(--accent-color),0.12)] disabled:opacity-40"
-          onClick={onDecrease}
-          aria-label="Disminuir temperatura"
-          disabled={controlsDisabled}
-        >
-          &minus;
-        </button>
-
-        <div className="flex flex-col items-center gap-1 text-center">
-          <span className="text-xs font-medium uppercase tracking-wide text-[color:var(--text-muted)]">
-            Temp. Deseada
-          </span>
-
-          <div className="flex items-baseline gap-1 text-[color:var(--text-primary)]">
-            <span className="text-4xl font-semibold leading-none">
-              {targetLabel}
+      <div className="flex flex-col gap-4 w-auto">
+        <div className="flex flex-col gap-4 rounded-2xl border border-[rgba(var(--accent-color),0.18)] bg-[rgba(var(--accent-color),0.08)] px-4 py-4">
+          <div className="flex items-center gap-3">
+            <span className="flex p-3 items-center justify-center rounded-2xl bg-[rgba(var(--accent-color),0.2)] text-[rgb(var(--accent-color))]">
+              <FontAwesomeIcon
+                icon={faTemperatureHalf}
+                className="h-7 w-7"
+                aria-hidden="true"
+              />
             </span>
-            <span className="text-base font-medium">
-              {DEGREE_SYMBOL}C
-            </span>
+            <div className="flex flex-col gap-1 text-[color:var(--text-primary)]">
+              <span className="text-s font-semibold tracking-wide text-[color:var(--text-muted)]">
+                Temperatura ambiente
+              </span>
+              <span className="text-3xl font-semibold leading-none">
+                {ambientValue}
+                {DEGREE_SYMBOL}C
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 rounded-2xl ml-auto text-[color:var(--text-primary)]" role="group" aria-label="Control de temperatura objetivo">
+            <div className="flex flex-col gap-1">
+              {/* <span className="text-xs font-semibold tracking-wide text-[color:var(--text-muted)]">
+                Control
+              </span> */}
+              <div className="flex items-baseline gap-2">
+                <span className="digital-display text-9xl font-semibold leading-none text-[rgb(var(--accent-color))] sm:text-9xl">
+                  {targetLabel}
+                </span>
+                <span className="text-xl font-semibold text-[color:var(--text-secondary)]">
+                  {DEGREE_SYMBOL}C
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-3">
+              <button
+                type="button"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-[rgba(var(--accent-color),0.12)] text-[rgb(var(--accent-color))] transition hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={onIncrease}
+                aria-label="Aumentar temperatura objetivo"
+                title="Aumentar temperatura objetivo"
+                disabled={controlsDisabled || sliderValue >= TEMPERATURE_MAX}
+              >
+                <FontAwesomeIcon icon={faArrowUp} className="h-5 w-5" />
+              </button>
+
+              <button
+                type="button"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-[rgba(var(--accent-color),0.12)] text-[rgb(var(--accent-color))] transition hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={onDecrease}
+                aria-label="Disminuir temperatura objetivo"
+                title="Disminuir temperatura objetivo"
+                disabled={controlsDisabled || sliderValue <= TEMPERATURE_MIN}
+              >
+                <FontAwesomeIcon icon={faArrowDown} className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
-
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-white text-lg font-semibold text-[rgb(var(--accent-color))] transition hover:bg-[rgba(var(--accent-color),0.12)] disabled:opacity-40"
-          onClick={onIncrease}
-          aria-label="Aumentar temperatura"
-          disabled={controlsDisabled}
-        >
-          +
-        </button>
       </div>
 
       <input
         type="range"
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[rgba(var(--accent-color),0.18)]"
+        className="sr-only"
         min={TEMPERATURE_MIN}
         max={TEMPERATURE_MAX}
         step={TEMPERATURE_STEP}
         value={sliderValue}
         onChange={handleInput}
-        aria-label="Temperatura deseada"
+        aria-label="Temperatura objetivo"
         disabled={controlsDisabled}
         style={sliderStyle}
       />

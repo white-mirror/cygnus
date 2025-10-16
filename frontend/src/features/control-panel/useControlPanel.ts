@@ -14,6 +14,7 @@ import {
   DEFAULT_TEMPERATURE,
   DEGREE_SYMBOL,
   FAN_SPEED_TO_API,
+  MODE_TO_API,
 } from "./constants";
 import type { ControlState, FanSpeed, Mode, StoredSelection } from "./types";
 import {
@@ -34,6 +35,7 @@ export interface ControlPanelHandlers {
   selectFanSpeed: (fanSpeed: FanSpeed) => void;
   adjustTemperature: (step: number) => void;
   setTemperature: (value: number) => void;
+  resetChanges: () => void;
   submitChanges: () => Promise<void>;
 }
 
@@ -545,6 +547,16 @@ export const useControlPanel = (): UseControlPanelResult => {
     );
   }, []);
 
+  const resetChanges = useCallback(() => {
+    setControlState((prev) => {
+      if (!baselineState) {
+        return prev;
+      }
+
+      return { ...baselineState };
+    });
+  }, [baselineState]);
+
   const submitChanges = useCallback(async () => {
     if (
       !controlState ||
@@ -560,7 +572,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     setStatusMessage("Enviando...");
 
     try {
-      const payloadMode = controlState.mode;
+      const payloadMode = MODE_TO_API[controlState.mode];
       const fanSetting = FAN_SPEED_TO_API[controlState.fanSpeed];
 
       await updateDeviceMode(selectedDeviceId, {
@@ -634,6 +646,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     selectFanSpeed,
     adjustTemperature,
     setTemperature,
+    resetChanges,
     submitChanges,
   };
 

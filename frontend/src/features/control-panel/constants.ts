@@ -1,4 +1,5 @@
-﻿import type { FanSpeed, Mode } from "./types";
+﻿import type { ModeSetting } from "../../api/bgh";
+import type { FanSpeed, Mode } from "./types";
 
 export const TEMPERATURE_MIN = 16;
 export const TEMPERATURE_MAX = 30;
@@ -28,12 +29,16 @@ export const MODE_ID_TO_MODE: Record<number, Mode> = {
   0: "off",
   1: "cool",
   2: "heat",
+  3: "dry",
+  4: "fan",
   254: "auto",
 };
 
 export const MODE_LABELS: Record<Mode, string> = {
   cool: "Frio",
   heat: "Calor",
+  dry: "Seco",
+  fan: "Ventilar",
   auto: "Auto",
   off: "Apagado",
 };
@@ -48,7 +53,18 @@ export const FAN_LABELS: Record<FanSpeed, string> = {
 export const ACCENT_BY_MODE: Record<Exclude<Mode, "off">, string> = {
   cool: "43, 139, 255",
   heat: "255, 120, 71",
+  dry: "255, 192, 105",
+  fan: "90, 164, 255",
   auto: "60, 184, 120",
 };
 
 export const ACCENT_OFF = "84, 101, 128";
+
+export const MODE_TO_API: Record<Mode, ModeSetting> = {
+  auto: "auto",
+  cool: "cool",
+  heat: "heat",
+  dry: "dry",
+  fan: "fan_only",
+  off: "off",
+};

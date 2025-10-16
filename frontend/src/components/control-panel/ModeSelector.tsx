@@ -4,8 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowsRotate,
+  faDroplet,
   faFire,
   faSnowflake,
+  faWind,
 } from "@fortawesome/free-solid-svg-icons";
 import { ACCENT_BY_MODE } from "../../features/control-panel/constants";
 import type { Mode } from "../../features/control-panel/types";
@@ -14,26 +16,32 @@ import { cn } from "../../lib/cn";
 const MODE_OPTIONS: Array<{
   id: Exclude<Mode, "off">;
   label: string;
-  description: string;
   icon: IconDefinition;
 }> = [
   {
+    id: "auto",
+    label: "Auto",
+    icon: faArrowsRotate,
+  },
+  {
     id: "cool",
     label: "Frio",
-    description: "Reduce la temperatura con flujo fresco",
     icon: faSnowflake,
+  },
+  {
+    id: "dry",
+    label: "Seco",
+    icon: faDroplet,
+  },
+  {
+    id: "fan",
+    label: "Ventilar",
+    icon: faWind,
   },
   {
     id: "heat",
     label: "Calor",
-    description: "Aumenta la temperatura de forma gradual",
     icon: faFire,
-  },
-  {
-    id: "auto",
-    label: "Auto",
-    description: "El equipo mantiene el clima automaticamente",
-    icon: faArrowsRotate,
   },
 ];
 
@@ -42,6 +50,8 @@ type ModeSelectorProps = {
   controlsDisabled: boolean;
   accentPreview: string;
   onSelect: (mode: Exclude<Mode, "off">) => void;
+  variant?: "card" | "section";
+  className?: string;
 };
 
 export const ModeSelector = ({
@@ -49,26 +59,36 @@ export const ModeSelector = ({
   controlsDisabled,
   accentPreview,
   onSelect,
+  variant = "card",
+  className,
 }: ModeSelectorProps): JSX.Element => {
   const selectorStyle = {
     "--selector-accent": accentPreview,
   } as CSSProperties;
 
   return (
-    <article
-      className="flex h-full w-full flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6"
+    <section
+      className={cn(
+        "flex h-full w-full flex-col",
+        variant === "card" &&
+          "rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
+        variant === "section" &&
+          "rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-4 sm:px-6 sm:py-5",
+        className,
+      )}
       style={selectorStyle}
     >
-      <div className="mb-4 flex flex-col gap-1">
-        <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-          Modo de Operacion
+      <header className="flex flex-col gap-1">
+        <h2 className="text-lg font-semibold text-[color:var(--text-primary)] mb-2">
+          Modo
         </h2>
-        <span className="text-sm text-[color:var(--text-muted)]">
-          Selecciona la forma de climatizar
-        </span>
-      </div>
+        {/* <p className="text-xs text-[color:var(--text-muted)]">
+          Define la configuracion principal del equipo
+        </p> */}
+      </header>
 
-      <div className="grid gap-3">
+      {/* <div className="grid gap-1 grid-cols-5"> */}
+      <div className="flex flex-row justify-between gap-3 w-min ml-auto">
         {MODE_OPTIONS.map((option) => {
           const isActive = activeMode === option.id;
           const optionStyle = {
@@ -80,7 +100,7 @@ export const ModeSelector = ({
               key={option.id}
               type="button"
               className={cn(
-                "flex w-full items-start gap-4 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--mode-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transform-gpu will-change-transform",
+                "flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--mode-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transform-gpu will-change-transform",
                 isActive &&
                   "border-[rgba(var(--mode-accent),0.45)] bg-[rgba(var(--mode-accent),0.14)]",
               )}
@@ -89,26 +109,24 @@ export const ModeSelector = ({
               aria-pressed={isActive}
               disabled={controlsDisabled}
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(var(--mode-accent),0.18)] text-[rgb(var(--mode-accent))]">
-                <FontAwesomeIcon icon={option.icon} className="h-5 w-5" />
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(var(--mode-accent),0.18)] text-[rgb(var(--mode-accent))]"
+                title={option.label}
+              >
+                <FontAwesomeIcon
+                  icon={option.icon}
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                />
               </span>
 
-              <span className="flex flex-col gap-1">
-                <span className="text-sm font-semibold text-[color:var(--text-primary)]">
-                  {option.label}
-                </span>
-                <span className="text-sm text-[color:var(--text-muted)]">
-                  {option.description}
-                </span>
+              <span className="text-xs font-semibold tracking-wide text-[color:var(--text-primary)]">
+                {option.label}
               </span>
             </button>
           );
         })}
-
-        <p className="rounded-2xl border border-dashed border-[color:var(--border-soft)] bg-[rgba(var(--selector-accent),0.06)] px-4 py-3 text-sm text-[color:var(--text-muted)]">
-          Cambiar a “Apagado” se mantiene en los controles principales.
-        </p>
       </div>
-    </article>
+    </section>
   );
 };

@@ -42,7 +42,7 @@ export const PanelFooter: FC<PanelFooterProps> = ({
       aria-label="Confirmar cambios pendientes"
       title="Confirmar cambios pendientes"
     >
-      <FontAwesomeIcon icon={faCheck} className="h-6 w-6" />
+      <FontAwesomeIcon icon={faCheck} className="h-6 w-6" aria-hidden="true" />
     </button>
   );
 

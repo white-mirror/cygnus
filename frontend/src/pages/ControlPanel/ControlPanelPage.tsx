@@ -5,7 +5,6 @@ import { DeviceList } from "../../components/control-panel/DeviceList";
 import { FanSelector } from "../../components/control-panel/FanSelector";
 import { HomeSelector } from "../../components/control-panel/HomeSelector";
 import { ModeSelector } from "../../components/control-panel/ModeSelector";
-import { PanelFooter } from "../../components/control-panel/PanelFooter";
 import {
   PanelHeader,
   type PanelHeaderNavItem,
@@ -114,8 +113,9 @@ export const ControlPanelPage = (): JSX.Element => {
     isFetchingDevices,
     isUpdatingDevice,
     errorMessage,
+    statusMessage,
     actualFanSpeed,
-    temperatureTrend,
+    // temperatureTrend,
     currentTemperatureLabel,
     targetTemperatureLabel,
     hasPendingChanges,
@@ -131,7 +131,15 @@ export const ControlPanelPage = (): JSX.Element => {
         "--accent-color": accentColor,
         "--confirm-accent": confirmAccentColor,
       }) as CSSProperties,
-    [accentColor, confirmAccentColor],
+    [accentColor, confirmAccentColor]
+  );
+
+  const applyButtonStyle = useMemo(
+    () =>
+      ({
+        "--action-accent": confirmAccentColor,
+      }) as CSSProperties,
+    [confirmAccentColor]
   );
 
   const handleLogout = (): void => {
@@ -162,82 +170,113 @@ export const ControlPanelPage = (): JSX.Element => {
       />
 
       <main className="relative z-0 flex flex-1 flex-col px-4 py-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 pb-28 lg:flex-row lg:items-start lg:justify-center lg:gap-10 xl:max-w-7xl">
-          <section className="flex w-full flex-col gap-6 lg:min-w-[250px] lg:max-w-[300px]">
-            <HomeSelector
-              homes={homes}
-              selectedHomeId={selectedHomeId}
-              disabled={isFetchingHomes}
-              onSelect={handlers.selectHome}
-            />
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 pb-12 xl:max-w-7xl">
+          <div className="flex flex-1 flex-col gap-6 lg:flex-row lg:items-start lg:justify-center lg:gap-10">
+            <section className="flex w-full flex-col gap-6 lg:min-w-[250px] lg:max-w-[300px]">
+              <HomeSelector
+                homes={homes}
+                selectedHomeId={selectedHomeId}
+                disabled={isFetchingHomes}
+                onSelect={handlers.selectHome}
+              />
 
-            <DeviceList
-              devices={devices}
-              selectedDeviceId={selectedDeviceId}
-              isLoading={isFetchingDevices}
-              isBusy={isUpdatingDevice}
-              onSelect={handlers.selectDevice}
-              onQuickToggle={handlers.quickToggleDevicePower}
-              className="flex-1"
-            />
-          </section>
-
-          <section className="flex w-full flex-col gap-6 lg:min-w-[650px] lg:max-w-[900px]">
-            {errorBanner}
-
-            <TemperatureCard
-              currentLabel={currentTemperatureLabel}
-              targetLabel={targetTemperatureLabel}
-              temperatureValue={controlState ? controlState.temperature : null}
-              controlsDisabled={controlsDisabled}
-              temperatureTrend={temperatureTrend}
-              onIncrease={() => handlers.adjustTemperature(TEMPERATURE_STEP)}
-              onDecrease={() => handlers.adjustTemperature(-TEMPERATURE_STEP)}
-              onChange={handlers.setTemperature}
-            />
-
-            <section className="flex flex-row flex-wrap gap-4">
-              <div className="flex-1">
-                <ModeSelector
-                  activeMode={controlState ? controlState.mode : null}
-                  controlsDisabled={controlsDisabled}
-                  accentPreview={modePreviewColor}
-                  onSelect={handlers.selectMode}
-                />
-              </div>
-
-              <div className="flex-1">
-                <FanSelector
-                  actualFanSpeed={actualFanSpeed}
-                  pendingFanSpeed={controlState ? controlState.fanSpeed : null}
-                  controlsDisabled={controlsDisabled}
-                  onSelect={handlers.selectFanSpeed}
-                />
-              </div>
+              <DeviceList
+                devices={devices}
+                selectedDeviceId={selectedDeviceId}
+                isLoading={isFetchingDevices}
+                isBusy={isUpdatingDevice}
+                onSelect={handlers.selectDevice}
+                onQuickToggle={handlers.quickToggleDevicePower}
+                className="flex-1"
+              />
             </section>
 
-            <PanelFooter
-              hasPendingChanges={hasPendingChanges}
-              controlsDisabled={controlsDisabled}
-              confirmAccent={confirmAccentColor}
-              onSubmit={() => {
-                void handlers.submitChanges();
-              }}
-              layout="sticky"
-            />
-          </section>
+            <section className="flex w-full flex-col gap-6 max-w-full lg:max-w-[500px]">
+              <div className="flex h-full w-full flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
+                <header className="flex flex-col gap-2 border-b border-[color:var(--border-soft)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                  <h1 className="text-2xl font-semibold text-[color:var(--text-primary)]">
+                    Panel de Control
+                  </h1>
+                  {statusMessage && statusMessage.length > 0 ? (
+                    <span className="text-xs font-semibold tracking-wide text-[color:var(--text-muted)]">
+                      {statusMessage}
+                    </span>
+                  ) : null}
+                </header>
+
+                <div className="flex flex-col gap-6 p-4">
+                  {errorBanner}
+
+                  <TemperatureCard
+                    currentLabel={currentTemperatureLabel}
+                    targetLabel={targetTemperatureLabel}
+                    temperatureValue={
+                      controlState ? controlState.temperature : null
+                    }
+                    controlsDisabled={controlsDisabled}
+                    // temperatureTrend={temperatureTrend}
+                    onIncrease={() =>
+                      handlers.adjustTemperature(TEMPERATURE_STEP)
+                    }
+                    onDecrease={() =>
+                      handlers.adjustTemperature(-TEMPERATURE_STEP)
+                    }
+                    onChange={handlers.setTemperature}
+                    variant="section"
+                  />
+
+                  {/* <div className="grid gap-4 lg:grid-cols-2"> */}
+                    <ModeSelector
+                      activeMode={controlState ? controlState.mode : null}
+                      controlsDisabled={controlsDisabled}
+                      accentPreview={modePreviewColor}
+                      onSelect={handlers.selectMode}
+                      variant="section"
+                      className="h-full"
+                    />
+
+                    <FanSelector
+                      actualFanSpeed={actualFanSpeed}
+                      pendingFanSpeed={
+                        controlState ? controlState.fanSpeed : null
+                      }
+                      controlsDisabled={controlsDisabled}
+                      onSelect={handlers.selectFanSpeed}
+                      variant="section"
+                      className="h-full"
+                    />
+                  {/* </div> */}
+                </div>
+
+                <footer className="flex flex-col gap-3 border-t border-[color:var(--border-soft)] bg-[var(--surface)]/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-2 text-sm font-semibold text-[color:var(--text-secondary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--border-soft)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={() => {
+                      handlers.resetChanges();
+                    }}
+                    disabled={!hasPendingChanges || isUpdatingDevice}
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--action-accent),0.5)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60 bg-[rgb(var(--action-accent))] hover:bg-[rgba(var(--action-accent),0.92)]"
+                    style={applyButtonStyle}
+                    onClick={() => {
+                      void handlers.submitChanges();
+                    }}
+                    disabled={!hasPendingChanges || controlsDisabled}
+                  >
+                    Aplicar
+                  </button>
+                </footer>
+              </div>
+            </section>
+          </div>
         </div>
       </main>
-
-      <PanelFooter
-        hasPendingChanges={hasPendingChanges}
-        controlsDisabled={controlsDisabled}
-        confirmAccent={confirmAccentColor}
-        onSubmit={() => {
-          void handlers.submitChanges();
-        }}
-        layout="floating"
-      />
     </div>
   );
 };

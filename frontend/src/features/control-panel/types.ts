@@ -1,6 +1,6 @@
 ﻿import type { ComponentType } from "react";
 
-export type Mode = "cool" | "heat" | "auto" | "off";
+export type Mode = "cool" | "heat" | "auto" | "dry" | "fan" | "off";
 
 export type FanSpeed = "auto" | "low" | "medium" | "high";
 
