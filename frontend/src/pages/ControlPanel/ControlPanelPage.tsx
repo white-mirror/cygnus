@@ -116,6 +116,8 @@ export const ControlPanelPage = (): JSX.Element => {
     statusMessage,
     actualMode,
     actualFanSpeed,
+    fanControlVisible,
+    temperatureControlVisible,
     // temperatureTrend,
     currentTemperatureLabel,
     targetTemperatureLabel,
@@ -208,35 +210,17 @@ export const ControlPanelPage = (): JSX.Element => {
                 <div className="flex flex-col gap-6 p-4">
                   {errorBanner}
 
-                  <TemperatureCard
-                    currentLabel={currentTemperatureLabel}
-                    targetLabel={targetTemperatureLabel}
-                    temperatureValue={
-                      controlState ? controlState.temperature : null
-                    }
+                  <ModeSelector
+                    activeMode={controlState ? controlState.mode : null}
+                    appliedMode={actualMode}
                     controlsDisabled={controlsDisabled}
-                    // temperatureTrend={temperatureTrend}
-                    onIncrease={() =>
-                      handlers.adjustTemperature(TEMPERATURE_STEP)
-                    }
-                    onDecrease={() =>
-                      handlers.adjustTemperature(-TEMPERATURE_STEP)
-                    }
-                    onChange={handlers.setTemperature}
+                    accentPreview={modePreviewColor}
+                    onSelect={handlers.selectMode}
                     variant="section"
+                    className="h-full"
                   />
 
-                  {/* <div className="grid gap-4 lg:grid-cols-2"> */}
-                    <ModeSelector
-                      activeMode={controlState ? controlState.mode : null}
-                      appliedMode={actualMode}
-                      controlsDisabled={controlsDisabled}
-                      accentPreview={modePreviewColor}
-                      onSelect={handlers.selectMode}
-                      variant="section"
-                      className="h-full"
-                    />
-
+                  {fanControlVisible ? (
                     <FanSelector
                       actualFanSpeed={actualFanSpeed}
                       pendingFanSpeed={
@@ -247,7 +231,27 @@ export const ControlPanelPage = (): JSX.Element => {
                       variant="section"
                       className="h-full"
                     />
-                  {/* </div> */}
+                  ) : null}
+
+                  {temperatureControlVisible ? (
+                    <TemperatureCard
+                      currentLabel={currentTemperatureLabel}
+                      targetLabel={targetTemperatureLabel}
+                      temperatureValue={
+                        controlState ? controlState.temperature : null
+                      }
+                      controlsDisabled={controlsDisabled}
+                      // temperatureTrend={temperatureTrend}
+                      onIncrease={() =>
+                        handlers.adjustTemperature(TEMPERATURE_STEP)
+                      }
+                      onDecrease={() =>
+                        handlers.adjustTemperature(-TEMPERATURE_STEP)
+                      }
+                      onChange={handlers.setTemperature}
+                      variant="section"
+                    />
+                  ) : null}
                 </div>
 
                 <footer className="flex flex-col gap-3 border-t border-[color:var(--border-soft)] bg-[var(--surface)]/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">

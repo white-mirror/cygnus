@@ -14,6 +14,8 @@ import {
   DEGREE_SYMBOL,
   FAN_SPEED_TO_API,
   MODE_TO_API,
+  modeSupportsFanControl,
+  modeSupportsTargetTemperature,
 } from "./constants";
 import type { ControlState, FanSpeed, Mode, StoredSelection } from "./types";
 import {
@@ -77,6 +79,7 @@ export interface ControlPanelState {
   statusMessage: string | null;
   actualPowerOn: boolean;
   actualMode: Mode;
+  previewMode: Mode;
   actualFanSpeed: FanSpeed;
   actualTargetTemperature: number;
   accentColor: string;
@@ -87,6 +90,8 @@ export interface ControlPanelState {
   targetTemperatureLabel: string;
   hasPendingChanges: boolean;
   controlsDisabled: boolean;
+  temperatureControlVisible: boolean;
+  fanControlVisible: boolean;
 }
 
 export interface UseControlPanelResult {
@@ -123,11 +128,19 @@ export const useControlPanel = (): UseControlPanelResult => {
     [],
   );
 
+  const lastTargetTemperatureRef = useRef<number>(DEFAULT_TEMPERATURE);
   const actualPowerOn = baselineState?.powerOn ?? false;
   const actualMode = baselineState?.mode ?? "auto";
   const actualFanSpeed = baselineState?.fanSpeed ?? "auto";
-  const actualTargetTemperature =
-    baselineState?.temperature ?? DEFAULT_TEMPERATURE;
+  const actualTargetTemperature = baselineState
+    ? modeSupportsTargetTemperature(baselineState.mode)
+      ? baselineState.temperature
+      : lastTargetTemperatureRef.current
+    : lastTargetTemperatureRef.current;
+  const previewMode: Mode = controlState?.mode ?? actualMode;
+  const temperatureControlVisible =
+    modeSupportsTargetTemperature(previewMode);
+  const fanControlVisible = modeSupportsFanControl(previewMode);
 
   const accentColor = useMemo(() => {
     if (actualMode === "off") {
@@ -138,14 +151,12 @@ export const useControlPanel = (): UseControlPanelResult => {
   }, [actualMode]);
 
   const modePreviewColor = useMemo(() => {
-    const previewMode = controlState?.mode ?? actualMode;
-
     if (previewMode === "off") {
       return ACCENT_OFF;
     }
 
     return ACCENT_BY_MODE[previewMode as Exclude<Mode, "off">];
-  }, [actualMode, controlState?.mode]);
+  }, [previewMode]);
 
   const pendingCommandsRef = useRef<Map<string, PendingCommand>>(
     new Map(),
@@ -187,17 +198,28 @@ export const useControlPanel = (): UseControlPanelResult => {
         return;
       }
 
-      const { control, temperature } = normaliseDevice(device);
+      const matchesPending =
+        pendingCommand &&
+        pendingCommand.deviceId === device.deviceId &&
+        pendingCommand.homeId === homeId;
+
+      const fallbackTemperature =
+        matchesPending && controlState
+          ? controlState.temperature
+          : lastTargetTemperatureRef.current;
+      const { control, temperature } = normaliseDevice(
+        device,
+        fallbackTemperature,
+      );
 
       setBaselineState(control);
       setLiveTemperature(temperature);
       setStatusMessage(null);
       setErrorMessage(null);
 
-      const matchesPending =
-        pendingCommand &&
-        pendingCommand.deviceId === device.deviceId &&
-        pendingCommand.homeId === homeId;
+      if (modeSupportsTargetTemperature(control.mode)) {
+        lastTargetTemperatureRef.current = control.temperature;
+      }
 
       if (matchesPending) {
         setIsUpdatingDevice(false);
@@ -213,7 +235,7 @@ export const useControlPanel = (): UseControlPanelResult => {
         return prev;
       });
     },
-    [selectedDeviceId, selectedHomeId],
+    [controlState?.temperature, selectedDeviceId, selectedHomeId],
   );
 
   const handleCommandError = useCallback(
@@ -387,7 +409,14 @@ export const useControlPanel = (): UseControlPanelResult => {
       return;
     }
 
-    const { control, temperature } = normaliseDevice(selectedDevice);
+    const { control, temperature } = normaliseDevice(
+      selectedDevice,
+      lastTargetTemperatureRef.current,
+    );
+
+    if (modeSupportsTargetTemperature(control.mode)) {
+      lastTargetTemperatureRef.current = control.temperature;
+    }
 
     setControlState(control);
     setBaselineState(control);
@@ -465,9 +494,10 @@ export const useControlPanel = (): UseControlPanelResult => {
     liveTemperature === null ? null : Number(liveTemperature.toFixed(1)),
   );
 
-  const targetTemperatureLabel = controlState
-    ? controlState.temperature.toString().padStart(2, "0")
-    : "--";
+  const targetTemperatureLabel =
+    controlState && temperatureControlVisible
+      ? controlState.temperature.toString().padStart(2, "0")
+      : "--";
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -641,7 +671,16 @@ export const useControlPanel = (): UseControlPanelResult => {
         return prev;
       }
 
-      return { ...prev, mode, powerOn: true };
+      const nextTemperature = modeSupportsTargetTemperature(mode)
+        ? lastTargetTemperatureRef.current
+        : prev.temperature;
+
+      return {
+        ...prev,
+        mode,
+        powerOn: true,
+        temperature: nextTemperature,
+      };
     });
   }, []);
 
@@ -656,6 +695,7 @@ export const useControlPanel = (): UseControlPanelResult => {
       }
 
       const nextValue = clampTemperature(prev.temperature + step);
+      lastTargetTemperatureRef.current = nextValue;
       return { ...prev, temperature: nextValue };
     });
   }, []);
@@ -665,14 +705,25 @@ export const useControlPanel = (): UseControlPanelResult => {
       return;
     }
 
-    setControlState((prev) =>
-      prev
-        ? { ...prev, temperature: clampTemperature(Math.round(value)) }
-        : prev,
-    );
+    setControlState((prev) => {
+      if (!prev) {
+        return prev;
+      }
+
+      const nextValue = clampTemperature(Math.round(value));
+      lastTargetTemperatureRef.current = nextValue;
+      return { ...prev, temperature: nextValue };
+    });
   }, []);
 
   const resetChanges = useCallback(() => {
+    if (
+      baselineState &&
+      modeSupportsTargetTemperature(baselineState.mode)
+    ) {
+      lastTargetTemperatureRef.current = baselineState.temperature;
+    }
+
     setControlState((prev) => {
       if (!baselineState) {
         return prev;
@@ -744,6 +795,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     statusMessage,
     actualPowerOn,
     actualMode,
+    previewMode,
     actualFanSpeed,
     actualTargetTemperature,
     accentColor,
@@ -754,6 +806,8 @@ export const useControlPanel = (): UseControlPanelResult => {
     targetTemperatureLabel,
     hasPendingChanges,
     controlsDisabled,
+    temperatureControlVisible,
+    fanControlVisible,
   };
 
   const handlers: ControlPanelHandlers = {

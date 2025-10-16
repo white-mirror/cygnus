@@ -88,12 +88,18 @@ export interface NormalisedDevice {
   temperature: number | null;
 }
 
-export const normaliseDevice = (device: DeviceStatusDTO): NormalisedDevice => {
+export const normaliseDevice = (
+  device: DeviceStatusDTO,
+  fallbackTemperature: number = DEFAULT_TEMPERATURE,
+): NormalisedDevice => {
   const mode = resolveMode(device.modeId ?? null);
   const fanSpeed = resolveFanSpeed(device.fanSpeed ?? null);
-  const targetTemperature = clampTemperature(
-    Math.round((device.targetTemperature ?? DEFAULT_TEMPERATURE) as number),
-  );
+  const resolvedTarget =
+    typeof device.targetTemperature === "number" &&
+    Number.isFinite(device.targetTemperature)
+      ? device.targetTemperature
+      : fallbackTemperature;
+  const targetTemperature = clampTemperature(Math.round(resolvedTarget));
 
   const temperature =
     typeof device.temperature === "number"
