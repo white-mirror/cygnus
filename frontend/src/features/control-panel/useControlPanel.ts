@@ -26,6 +26,17 @@ import {
   writeStoredSelection,
 } from "./utils";
 
+const wait = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+interface DeviceRefreshOptions {
+  attempts?: number;
+  delayMs?: number;
+  expected?: Partial<ControlState> | null;
+}
+
 export interface ControlPanelHandlers {
   selectHome: (homeId: number | null) => void;
   selectDevice: (deviceId: number) => void;
@@ -126,38 +137,77 @@ export const useControlPanel = (): UseControlPanelResult => {
     return ACCENT_BY_MODE[previewMode as Exclude<Mode, "off">];
   }, [actualMode, controlState?.mode]);
 
+  const applyDeviceSnapshot = useCallback((device: DeviceStatusDTO) => {
+    setDevices((prev) => {
+      const exists = prev.some((item) => item.deviceId === device.deviceId);
+
+      if (exists) {
+        return prev.map((item) =>
+          item.deviceId === device.deviceId ? device : item,
+        );
+      }
+
+      return [...prev, device];
+    });
+
+    const { control, temperature } = normaliseDevice(device);
+
+    setControlState(control);
+    setBaselineState(control);
+    setLiveTemperature(temperature);
+  }, []);
+
   const updateDeviceState = useCallback(
     async (
       homeId: number,
       deviceId: number,
+      options?: DeviceRefreshOptions,
     ): Promise<DeviceStatusDTO | null> => {
-      const device = await fetchDeviceStatus(homeId, deviceId);
+      const attempts = Math.max(1, options?.attempts ?? 1);
+      const delayMs = options?.delayMs ?? 750;
+      const expected = options?.expected ?? null;
 
-      if (!device) {
-        return null;
-      }
+      let lastDevice: DeviceStatusDTO | null = null;
 
-      setDevices((prev) => {
-        const exists = prev.some((item) => item.deviceId === device.deviceId);
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
+        const device = await fetchDeviceStatus(homeId, deviceId);
 
-        if (exists) {
-          return prev.map((item) =>
-            item.deviceId === device.deviceId ? device : item,
-          );
+        if (!device) {
+          lastDevice = null;
+          break;
         }
 
-        return [...prev, device];
-      });
+        lastDevice = device;
 
-      const { control, temperature } = normaliseDevice(device);
+        const { control } = normaliseDevice(device);
 
-      setControlState(control);
-      setBaselineState(control);
-      setLiveTemperature(temperature);
+        const matchesExpected =
+          expected === null ||
+          ((expected.mode === undefined || control.mode === expected.mode) &&
+            (expected.fanSpeed === undefined ||
+              control.fanSpeed === expected.fanSpeed) &&
+            (expected.temperature === undefined ||
+              control.temperature === expected.temperature) &&
+            (expected.powerOn === undefined ||
+              control.powerOn === expected.powerOn));
 
-      return device;
+        if (matchesExpected || attempt === attempts - 1) {
+          applyDeviceSnapshot(device);
+          return device;
+        }
+
+        if (attempt < attempts - 1 && delayMs > 0) {
+          await wait(delayMs);
+        }
+      }
+
+      if (lastDevice) {
+        applyDeviceSnapshot(lastDevice);
+      }
+
+      return lastDevice;
     },
-    [],
+    [applyDeviceSnapshot],
   );
 
   useEffect(() => {
@@ -422,9 +472,17 @@ export const useControlPanel = (): UseControlPanelResult => {
           fan: "auto",
         });
 
+        const expectedState: Partial<ControlState> = powerOn
+          ? { powerOn: true }
+          : { powerOn: false, mode: "off" };
+
         const refreshedDevice = await updateDeviceState(
           selectedHomeId,
           deviceId,
+          {
+            attempts: 4,
+            expected: expectedState,
+          },
         );
 
         if (!refreshedDevice) {
@@ -575,6 +633,13 @@ export const useControlPanel = (): UseControlPanelResult => {
       const payloadMode = MODE_TO_API[controlState.mode];
       const fanSetting = FAN_SPEED_TO_API[controlState.fanSpeed];
 
+      const desiredState: Partial<ControlState> = {
+        mode: controlState.mode,
+        fanSpeed: controlState.fanSpeed,
+        powerOn: controlState.powerOn,
+        temperature: controlState.temperature,
+      };
+
       await updateDeviceMode(selectedDeviceId, {
         mode: payloadMode,
         targetTemperature: controlState.temperature,
@@ -584,6 +649,10 @@ export const useControlPanel = (): UseControlPanelResult => {
       const refreshedDevice = await updateDeviceState(
         selectedHomeId,
         selectedDeviceId,
+        {
+          attempts: 5,
+          expected: desiredState,
+        },
       );
 
       if (!refreshedDevice) {
