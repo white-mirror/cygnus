@@ -47,6 +47,7 @@ const MODE_OPTIONS: Array<{
 
 type ModeSelectorProps = {
   activeMode: Mode | null;
+  appliedMode: Mode | null;
   controlsDisabled: boolean;
   accentPreview: string;
   onSelect: (mode: Exclude<Mode, "off">) => void;
@@ -56,6 +57,7 @@ type ModeSelectorProps = {
 
 export const ModeSelector = ({
   activeMode,
+  appliedMode,
   controlsDisabled,
   accentPreview,
   onSelect,
@@ -90,7 +92,16 @@ export const ModeSelector = ({
       {/* <div className="grid gap-1 grid-cols-5"> */}
       <div className="flex flex-row justify-between gap-3 w-min ml-auto">
         {MODE_OPTIONS.map((option) => {
-          const isActive = activeMode === option.id;
+          const isSelected = activeMode === option.id;
+          const isApplied = appliedMode === option.id;
+          const isPendingSelection = isSelected && !isApplied;
+          const isInactive = !isSelected && !isApplied;
+          const iconHighlightStyle = isPendingSelection
+            ? { borderColor: "rgb(var(--mode-accent))" }
+            : undefined;
+          const labelHighlightStyle = isPendingSelection
+            ? { color: "rgb(var(--mode-accent))" }
+            : undefined;
           const optionStyle = {
             "--mode-accent": ACCENT_BY_MODE[option.id],
           } as CSSProperties;
@@ -100,17 +111,19 @@ export const ModeSelector = ({
               key={option.id}
               type="button"
               className={cn(
-                "flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--mode-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transform-gpu will-change-transform",
-                isActive &&
-                  "border-[rgba(var(--mode-accent),0.45)] bg-[rgba(var(--mode-accent),0.14)]",
+                "flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border border-[color:var(--border-soft)] text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--mode-accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed",
               )}
               style={optionStyle}
               onClick={() => onSelect(option.id)}
-              aria-pressed={isActive}
+              aria-pressed={isSelected}
               disabled={controlsDisabled}
             >
               <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(var(--mode-accent),0.18)] text-[rgb(var(--mode-accent))]"
+                className={cn(
+                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-transparent text-[rgb(var(--mode-accent))]",
+                  isInactive && "opacity-50",
+                )}
+                style={iconHighlightStyle}
                 title={option.label}
               >
                 <FontAwesomeIcon
@@ -120,7 +133,13 @@ export const ModeSelector = ({
                 />
               </span>
 
-              <span className="text-xs font-semibold tracking-wide text-[color:var(--text-primary)]">
+              <span
+                className={cn(
+                  "text-xs font-semibold tracking-wide text-white",
+                  isInactive && "opacity-50",
+                )}
+                style={labelHighlightStyle}
+              >
                 {option.label}
               </span>
             </button>

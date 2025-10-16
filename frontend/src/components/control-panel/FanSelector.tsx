@@ -20,19 +20,19 @@ const FAN_OPTIONS: Array<{
   },
   {
     id: "low",
-    label: "1",
+    label: "Baja",
     // sublabel: "Baja",
     icon: fa1,
   },
   {
     id: "medium",
-    label: "2",
+    label: "Media",
     // sublabel: "Media",
     icon: fa2,
   },
   {
     id: "high",
-    label: "3",
+    label: "Alta",
     // sublabel: "Alta",
     icon: fa3,
   },
@@ -49,7 +49,7 @@ type FanSelectorProps = {
 
 export const FanSelector = ({
   actualFanSpeed,
-  // pendingFanSpeed,
+  pendingFanSpeed,
   controlsDisabled,
   onSelect,
   variant = "card",
@@ -78,10 +78,18 @@ export const FanSelector = ({
     <div className="flex flex-row justify-between gap-3 w-min ml-auto">
       {FAN_OPTIONS.map((option) => {
         const isActive = actualFanSpeed === option.id;
-        // const isPending =
-        //   pendingFanSpeed !== null &&
-        //   pendingFanSpeed === option.id &&
-        //   pendingFanSpeed !== actualFanSpeed;
+        const isSelected = pendingFanSpeed === option.id;
+        const isPending =
+          pendingFanSpeed !== null &&
+          pendingFanSpeed === option.id &&
+          pendingFanSpeed !== actualFanSpeed;
+        const isInactive = !isSelected && !isActive;
+        const iconHighlightStyle = isPending
+          ? { borderColor: "rgb(var(--accent-color))" }
+          : undefined;
+        const labelHighlightStyle = isPending
+          ? { color: "rgb(var(--accent-color))" }
+          : undefined;
 
         const accessibilityLabel =
           option.id === "auto"
@@ -93,17 +101,21 @@ export const FanSelector = ({
             key={option.id}
             type="button"
             className={cn(
-              "flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transform-gpu will-change-transform",
-              isActive &&
-                "border-[rgba(var(--accent-color),0.4)] bg-[rgba(var(--accent-color),0.12)]"
+              "flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border border-[color:var(--border-soft)] text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed",
             )}
             onClick={() => onSelect(option.id)}
-            aria-pressed={isActive}
+            aria-pressed={isSelected || isActive}
             aria-label={accessibilityLabel}
             title={accessibilityLabel}
             disabled={controlsDisabled}
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.16)] text-[rgb(var(--accent-color))]">
+            <span
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-transparent text-[rgb(var(--accent-color))]",
+                isInactive && "opacity-50",
+              )}
+              style={iconHighlightStyle}
+            >
               <FontAwesomeIcon
                 icon={option.icon}
                 className="h-5 w-5"
@@ -112,7 +124,13 @@ export const FanSelector = ({
             </span>
 
             <span className="flex flex-col items-center gap-1">
-              <span className="text-sm font-semibold tracking-wide text-[color:var(--text-primary)]">
+              <span
+                className={cn(
+                  "text-sm font-semibold tracking-wide text-white",
+                  isInactive && "opacity-50",
+                )}
+                style={labelHighlightStyle}
+              >
                 {option.label}
               </span>
               <span className="text-xs text-[color:var(--text-muted)]">

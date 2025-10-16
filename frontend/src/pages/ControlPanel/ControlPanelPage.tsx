@@ -114,6 +114,7 @@ export const ControlPanelPage = (): JSX.Element => {
     isUpdatingDevice,
     errorMessage,
     statusMessage,
+    actualMode,
     actualFanSpeed,
     // temperatureTrend,
     currentTemperatureLabel,
@@ -228,6 +229,7 @@ export const ControlPanelPage = (): JSX.Element => {
                   {/* <div className="grid gap-4 lg:grid-cols-2"> */}
                     <ModeSelector
                       activeMode={controlState ? controlState.mode : null}
+                      appliedMode={actualMode}
                       controlsDisabled={controlsDisabled}
                       accentPreview={modePreviewColor}
                       onSelect={handlers.selectMode}
