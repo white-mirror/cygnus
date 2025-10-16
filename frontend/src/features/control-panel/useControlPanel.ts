@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  fetchDeviceStatus,
   fetchDevices,
   fetchHomes,
   updateDeviceMode,
@@ -26,16 +25,27 @@ import {
   writeStoredSelection,
 } from "./utils";
 
-const wait = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+type DeviceUpdateEventPayload = {
+  jobId?: string | null;
+  homeId: number;
+  deviceId: number;
+  device: DeviceStatusDTO;
+};
 
-interface DeviceRefreshOptions {
-  attempts?: number;
-  delayMs?: number;
-  expected?: Partial<ControlState> | null;
-}
+type CommandErrorEventPayload = {
+  jobId?: string | null;
+  homeId: number;
+  deviceId: number;
+  message: string;
+};
+
+type PendingCommand = {
+  jobId: string;
+  homeId: number;
+  deviceId: number;
+};
+
+const EVENT_SOURCE_URL = "/api/bgh/events";
 
 export interface ControlPanelHandlers {
   selectHome: (homeId: number | null) => void;
@@ -137,77 +147,94 @@ export const useControlPanel = (): UseControlPanelResult => {
     return ACCENT_BY_MODE[previewMode as Exclude<Mode, "off">];
   }, [actualMode, controlState?.mode]);
 
-  const applyDeviceSnapshot = useCallback((device: DeviceStatusDTO) => {
-    setDevices((prev) => {
-      const exists = prev.some((item) => item.deviceId === device.deviceId);
+  const pendingCommandsRef = useRef<Map<string, PendingCommand>>(
+    new Map(),
+  );
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const hasPendingChangesRef = useRef(false);
 
-      if (exists) {
-        return prev.map((item) =>
-          item.deviceId === device.deviceId ? device : item,
-        );
+  const applySnapshot = useCallback(
+    (homeId: number, device: DeviceStatusDTO, jobId?: string | null) => {
+      const pendingCommand = jobId
+        ? pendingCommandsRef.current.get(jobId)
+        : undefined;
+
+      if (jobId) {
+        pendingCommandsRef.current.delete(jobId);
       }
 
-      return [...prev, device];
-    });
+      if (homeId === selectedHomeId) {
+        setDevices((prev) => {
+          const exists = prev.some(
+            (item) => item.deviceId === device.deviceId,
+          );
 
-    const { control, temperature } = normaliseDevice(device);
+          if (!exists) {
+            return [...prev, device];
+          }
 
-    setControlState(control);
-    setBaselineState(control);
-    setLiveTemperature(temperature);
-  }, []);
-
-  const updateDeviceState = useCallback(
-    async (
-      homeId: number,
-      deviceId: number,
-      options?: DeviceRefreshOptions,
-    ): Promise<DeviceStatusDTO | null> => {
-      const attempts = Math.max(1, options?.attempts ?? 1);
-      const delayMs = options?.delayMs ?? 750;
-      const expected = options?.expected ?? null;
-
-      let lastDevice: DeviceStatusDTO | null = null;
-
-      for (let attempt = 0; attempt < attempts; attempt += 1) {
-        const device = await fetchDeviceStatus(homeId, deviceId);
-
-        if (!device) {
-          lastDevice = null;
-          break;
-        }
-
-        lastDevice = device;
-
-        const { control } = normaliseDevice(device);
-
-        const matchesExpected =
-          expected === null ||
-          ((expected.mode === undefined || control.mode === expected.mode) &&
-            (expected.fanSpeed === undefined ||
-              control.fanSpeed === expected.fanSpeed) &&
-            (expected.temperature === undefined ||
-              control.temperature === expected.temperature) &&
-            (expected.powerOn === undefined ||
-              control.powerOn === expected.powerOn));
-
-        if (matchesExpected || attempt === attempts - 1) {
-          applyDeviceSnapshot(device);
-          return device;
-        }
-
-        if (attempt < attempts - 1 && delayMs > 0) {
-          await wait(delayMs);
-        }
+          return prev.map((item) =>
+            item.deviceId === device.deviceId ? device : item,
+          );
+        });
       }
 
-      if (lastDevice) {
-        applyDeviceSnapshot(lastDevice);
+      if (
+        homeId !== selectedHomeId ||
+        selectedDeviceId === null ||
+        selectedDeviceId !== device.deviceId
+      ) {
+        return;
       }
 
-      return lastDevice;
+      const { control, temperature } = normaliseDevice(device);
+
+      setBaselineState(control);
+      setLiveTemperature(temperature);
+      setStatusMessage(null);
+      setErrorMessage(null);
+
+      const matchesPending =
+        pendingCommand &&
+        pendingCommand.deviceId === device.deviceId &&
+        pendingCommand.homeId === homeId;
+
+      if (matchesPending) {
+        setIsUpdatingDevice(false);
+      }
+
+      const shouldSyncControl =
+        matchesPending || !hasPendingChangesRef.current;
+
+      setControlState((prev) => {
+        if (!prev || shouldSyncControl) {
+          return control;
+        }
+        return prev;
+      });
     },
-    [applyDeviceSnapshot],
+    [selectedDeviceId, selectedHomeId],
+  );
+
+  const handleCommandError = useCallback(
+    (payload: CommandErrorEventPayload) => {
+      if (payload.jobId) {
+        pendingCommandsRef.current.delete(payload.jobId);
+      }
+
+      if (
+        payload.homeId !== selectedHomeId ||
+        selectedDeviceId === null ||
+        payload.deviceId !== selectedDeviceId
+      ) {
+        return;
+      }
+
+      setIsUpdatingDevice(false);
+      setStatusMessage(null);
+      setErrorMessage(payload.message);
+    },
+    [selectedDeviceId, selectedHomeId],
   );
 
   useEffect(() => {
@@ -382,6 +409,10 @@ export const useControlPanel = (): UseControlPanelResult => {
     );
   }, [baselineState, controlState]);
 
+  useEffect(() => {
+    hasPendingChangesRef.current = hasPendingChanges;
+  }, [hasPendingChanges]);
+
   const confirmAccentColor = useMemo(() => {
     if (!controlState || !baselineState) {
       return accentColor;
@@ -438,6 +469,50 @@ export const useControlPanel = (): UseControlPanelResult => {
     ? controlState.temperature.toString().padStart(2, "0")
     : "--";
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const source = new EventSource(EVENT_SOURCE_URL);
+    eventSourceRef.current = source;
+
+    const handleUpdate = (event: MessageEvent) => {
+      try {
+        const payload = JSON.parse(event.data) as DeviceUpdateEventPayload;
+        applySnapshot(payload.homeId, payload.device, payload.jobId ?? null);
+      } catch (error) {
+        console.error("[control-panel] Error parsing device update event", error);
+      }
+    };
+
+    const handleErrorEvent = (event: MessageEvent) => {
+      try {
+        const payload = JSON.parse(event.data) as CommandErrorEventPayload;
+        handleCommandError(payload);
+      } catch (error) {
+        console.error("[control-panel] Error parsing command error event", error);
+      }
+    };
+
+    source.addEventListener("device-update", handleUpdate);
+    source.addEventListener("command-error", handleErrorEvent);
+
+    source.onerror = () => {
+      setStatusMessage((prev) =>
+        prev ?? "Conexión en tiempo real interrumpida. Reintentando...",
+      );
+      setIsUpdatingDevice(false);
+    };
+
+    return () => {
+      source.removeEventListener("device-update", handleUpdate);
+      source.removeEventListener("command-error", handleErrorEvent);
+      source.close();
+      eventSourceRef.current = null;
+    };
+  }, [applySnapshot, handleCommandError]);
+
   const applyPowerCommand = useCallback(
     async (
       deviceId: number | null,
@@ -466,30 +541,18 @@ export const useControlPanel = (): UseControlPanelResult => {
       setStatusMessage(powerOn ? "Encendiendo..." : "Apagando...");
 
       try {
-        await updateDeviceMode(deviceId, {
-          mode: commandMode,
+        const { jobId } = await updateDeviceMode(deviceId, {
+          mode: MODE_TO_API[commandMode],
           targetTemperature,
-          fan: "auto",
+          fan: FAN_SPEED_TO_API.auto,
+          homeId: selectedHomeId,
         });
 
-        const expectedState: Partial<ControlState> = powerOn
-          ? { powerOn: true }
-          : { powerOn: false, mode: "off" };
-
-        const refreshedDevice = await updateDeviceState(
-          selectedHomeId,
+        pendingCommandsRef.current.set(jobId, {
+          jobId,
+          homeId: selectedHomeId,
           deviceId,
-          {
-            attempts: 4,
-            expected: expectedState,
-          },
-        );
-
-        if (!refreshedDevice) {
-          setErrorMessage("No se pudo obtener el estado actualizado");
-        } else {
-          setStatusMessage(null);
-        }
+        });
       } catch (error) {
         const message =
           error instanceof Error
@@ -498,11 +561,10 @@ export const useControlPanel = (): UseControlPanelResult => {
 
         setErrorMessage(message);
         setStatusMessage(null);
-      } finally {
         setIsUpdatingDevice(false);
       }
     },
-    [actualTargetTemperature, selectedHomeId, updateDeviceState],
+    [actualTargetTemperature, selectedHomeId],
   );
 
   const selectHome = useCallback(
@@ -514,6 +576,9 @@ export const useControlPanel = (): UseControlPanelResult => {
       setControlState(null);
       setBaselineState(null);
       setLiveTemperature(null);
+      setIsUpdatingDevice(false);
+      setStatusMessage(null);
+      setErrorMessage(null);
       persistSelection(nextId, null);
     },
     [persistSelection],
@@ -523,6 +588,8 @@ export const useControlPanel = (): UseControlPanelResult => {
     (deviceId: number) => {
       setSelectedDeviceId(deviceId);
       setStatusMessage(null);
+      setIsUpdatingDevice(false);
+      setErrorMessage(null);
 
       if (selectedHomeId !== null) {
         persistSelection(selectedHomeId, deviceId);
@@ -633,40 +700,24 @@ export const useControlPanel = (): UseControlPanelResult => {
       const payloadMode = MODE_TO_API[controlState.mode];
       const fanSetting = FAN_SPEED_TO_API[controlState.fanSpeed];
 
-      const desiredState: Partial<ControlState> = {
-        mode: controlState.mode,
-        fanSpeed: controlState.fanSpeed,
-        powerOn: controlState.powerOn,
-        temperature: controlState.temperature,
-      };
-
-      await updateDeviceMode(selectedDeviceId, {
+      const { jobId } = await updateDeviceMode(selectedDeviceId, {
         mode: payloadMode,
         targetTemperature: controlState.temperature,
         fan: fanSetting,
+        homeId: selectedHomeId,
       });
 
-      const refreshedDevice = await updateDeviceState(
-        selectedHomeId,
-        selectedDeviceId,
-        {
-          attempts: 5,
-          expected: desiredState,
-        },
-      );
-
-      if (!refreshedDevice) {
-        setErrorMessage("No se pudo obtener el estado actualizado");
-      } else {
-        setStatusMessage(null);
-      }
+      pendingCommandsRef.current.set(jobId, {
+        jobId,
+        homeId: selectedHomeId,
+        deviceId: selectedDeviceId,
+      });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "No se pudo enviar el comando";
 
       setErrorMessage(message);
       setStatusMessage(null);
-    } finally {
       setIsUpdatingDevice(false);
     }
   }, [
@@ -674,7 +725,6 @@ export const useControlPanel = (): UseControlPanelResult => {
     hasPendingChanges,
     selectedDeviceId,
     selectedHomeId,
-    updateDeviceState,
   ]);
 
   const state: ControlPanelState = {

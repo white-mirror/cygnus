@@ -32,7 +32,8 @@ interface DeviceResponse {
 }
 
 interface UpdateModeResponse {
-  result?: Record<string, unknown>;
+  jobId?: string;
+  position?: number;
 }
 
 export type FanSetting = "auto" | "low" | "mid" | "high";
@@ -43,6 +44,7 @@ export interface UpdateModePayload {
   targetTemperature: number;
   fan?: FanSetting;
   flags?: number;
+  homeId: number;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -133,10 +135,15 @@ export async function fetchDeviceStatus(
   return data.device ?? null;
 }
 
+export interface UpdateModeResult {
+  jobId: string;
+  position: number;
+}
+
 export async function updateDeviceMode(
   deviceId: number,
   payload: UpdateModePayload,
-): Promise<Record<string, unknown>> {
+): Promise<UpdateModeResult> {
   const data = await request<UpdateModeResponse>(
     `/devices/${deviceId}/mode`,
     {
@@ -149,5 +156,12 @@ export async function updateDeviceMode(
     { action: "updateDeviceMode", deviceId, payload },
   );
 
-  return data.result ?? {};
+  if (!data.jobId) {
+    throw new Error("No se obtuvo la referencia del comando");
+  }
+
+  return {
+    jobId: data.jobId,
+    position: typeof data.position === "number" ? data.position : 0,
+  };
 }

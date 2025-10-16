@@ -6,9 +6,14 @@ import {
   getDeviceStatus as getDeviceStatusService,
   listDevices as listDevicesService,
   listHomes as listHomesService,
-  setDeviceMode as setDeviceModeService,
   type BghServiceErrorCode,
 } from "../services/bghService";
+import { FAN_MODES, HVAC_MODES } from "integrations/bgh/client";
+import {
+  enqueueCommand,
+  type CommandPayload,
+} from "../services/commandQueue";
+import { registerClient } from "../services/eventStream";
 
 type LoggedRequest = Request & { log: Logger };
 
@@ -147,18 +152,38 @@ export const getDeviceStatus: Controller = async (req, res, next) => {
   }
 };
 
-export const setDeviceMode: Controller = async (req, res, next) => {
+export const setDeviceMode: Controller = async (req, res, _next) => {
   const log = getRequestLogger(req).child({ route: "setDeviceMode" });
   const deviceId = parseNumericParam(log, req.params.deviceId, "deviceId", res);
   if (deviceId === null) {
     return;
   }
 
-  const { mode, targetTemperature, fan, flags } = req.body ?? {};
+  const { mode, targetTemperature, fan, flags, homeId } = req.body ?? {};
+
+  if (typeof homeId !== "number" || !Number.isFinite(homeId)) {
+    const message = "Body must include a numeric 'homeId' field.";
+    log.warn({ deviceId }, message);
+    res.status(400).json({
+      code: "INVALID_BODY",
+      message,
+    });
+    return;
+  }
 
   if (typeof mode !== "string" || mode.length === 0) {
     const message = "Body must include a non-empty 'mode' field.";
     log.warn({ deviceId }, message);
+    res.status(400).json({
+      code: "INVALID_BODY",
+      message,
+    });
+    return;
+  }
+
+  if (!(mode in HVAC_MODES)) {
+    const message = `Unsupported mode '${mode}'.`;
+    log.warn({ deviceId, mode }, message);
     res.status(400).json({
       code: "INVALID_BODY",
       message,
@@ -179,24 +204,47 @@ export const setDeviceMode: Controller = async (req, res, next) => {
     return;
   }
 
-  log.info(
-    { deviceId, mode, targetTemperature, fan, flags },
-    "Updating device mode",
-  );
-  try {
-    const result = await setDeviceModeService(
-      deviceId,
-      {
-        mode,
-        targetTemperature,
-        fan,
-        flags,
-      },
-      log,
-    );
-    log.info({ deviceId }, "Device mode updated");
-    res.json({ result });
-  } catch (error) {
-    handleError(error, log, res, next);
+  const payload: CommandPayload = {
+    mode: mode as CommandPayload["mode"],
+    targetTemperature,
+  };
+
+  if (typeof fan === "string" && fan.length > 0) {
+    if (!(fan in FAN_MODES)) {
+      const message = `Unsupported fan mode '${fan}'.`;
+      log.warn({ deviceId, fan }, message);
+      res.status(400).json({
+        code: "INVALID_BODY",
+        message,
+      });
+      return;
+    }
+    payload.fan = fan as CommandPayload["fan"];
   }
+
+  if (typeof flags === "number" && Number.isFinite(flags)) {
+    payload.flags = flags as CommandPayload["flags"];
+  }
+
+  log.info(
+    { deviceId, mode, targetTemperature, fan, flags, homeId },
+    "Queueing device mode update",
+  );
+
+  const { jobId, position } = enqueueCommand({
+    homeId,
+    deviceId,
+    payload,
+    log,
+  });
+
+  res.status(202).json({
+    jobId,
+    position,
+  });
+};
+
+export const streamDeviceEvents = (req: Request, res: Response): void => {
+  const log = getRequestLogger(req).child({ route: "streamDeviceEvents" });
+  registerClient(req, res, log);
 };
