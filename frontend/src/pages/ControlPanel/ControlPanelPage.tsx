@@ -1,5 +1,7 @@
 import type { CSSProperties, JSX, TouchEventHandler } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 
 import { DeviceList } from "../../components/control-panel/DeviceList";
 import { FanSelector } from "../../components/control-panel/FanSelector";
@@ -189,6 +191,7 @@ export const ControlPanelPage = (): JSX.Element => {
     devices,
     selectedHomeId,
     selectedDeviceId,
+    actualPowerOn,
     controlState,
     isFetchingHomes,
     isFetchingDevices,
@@ -273,9 +276,43 @@ export const ControlPanelPage = (): JSX.Element => {
     <section className="flex w-full flex-col gap-6 max-w-full lg:max-w-[500px]">
       <div className="flex h-full w-full flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
         <header className="flex flex-col gap-2 border-b border-[color:var(--border-soft)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <h1 className="text-2xl font-semibold text-[color:var(--text-primary)]">
-            Panel de Control
-          </h1>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface)] text-[color:var(--text-primary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--border-soft)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60 lg:hidden"
+                aria-label="Volver a la selección"
+                onClick={() => {
+                  goToPreviousSlide();
+                }}
+                disabled={activeMobileSlide === 0}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
+              </button>
+
+              <h1 className="text-2xl font-semibold text-[color:var(--text-primary)]">
+                Panel de Control
+              </h1>
+            </div>
+
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(var(--action-accent),0.35)] bg-[rgba(var(--action-accent),0.12)] text-[rgb(var(--action-accent))] transition hover:bg-[rgba(var(--action-accent),0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--action-accent),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60 lg:hidden"
+              style={applyButtonStyle}
+              aria-label={
+                actualPowerOn ? "Apagar equipo seleccionado" : "Encender equipo seleccionado"
+              }
+              onClick={() => {
+                handlers.togglePanelPower();
+              }}
+              disabled={
+                selectedDeviceId === null || isUpdatingDevice || controlsDisabled
+              }
+            >
+              <FontAwesomeIcon icon={faPowerOff} className="h-4 w-4" />
+            </button>
+          </div>
+
           {statusMessage && statusMessage.length > 0 ? (
             <span className="text-xs font-semibold tracking-wide text-[color:var(--text-muted)]">
               {statusMessage}
