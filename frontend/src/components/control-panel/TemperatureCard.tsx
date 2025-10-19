@@ -97,7 +97,7 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
               <span className="text-s font-semibold tracking-wide text-[color:var(--text-muted)]">
                 Temperatura ambiente
               </span>
-              <span className="text-3xl font-semibold leading-none">
+              <span className="text-2xl font-semibold leading-none">
                 {ambientValue}
                 {DEGREE_SYMBOL}C
               </span>
@@ -110,7 +110,7 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
                 Control
               </span> */}
               <div className="flex items-baseline gap-2">
-                <span className="digital-display text-9xl font-semibold leading-none text-[rgb(var(--accent-color))] sm:text-9xl">
+                <span className="digital-display text-8xl font-semibold leading-none text-[rgb(var(--accent-color))] sm:text-9xl">
                   {targetLabel}
                 </span>
                 <span className="text-xl font-semibold text-[color:var(--text-secondary)]">
@@ -122,7 +122,7 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
             <div className="flex flex-col items-center justify-center gap-3">
               <button
                 type="button"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-[rgba(var(--accent-color),0.12)] text-[rgb(var(--accent-color))] transition hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-[rgba(var(--accent-color),0.12)] text-[rgb(var(--accent-color))] transition hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={onIncrease}
                 aria-label="Aumentar temperatura objetivo"
                 title="Aumentar temperatura objetivo"
@@ -133,7 +133,7 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
 
               <button
                 type="button"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-[rgba(var(--accent-color),0.12)] text-[rgb(var(--accent-color))] transition hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(var(--accent-color),0.3)] bg-[rgba(var(--accent-color),0.12)] text-[rgb(var(--accent-color))] transition hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-color),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={onDecrease}
                 aria-label="Disminuir temperatura objetivo"
                 title="Disminuir temperatura objetivo"

@@ -73,9 +73,9 @@ export const ModeSelector = ({
       className={cn(
         "flex h-full w-full flex-col",
         variant === "card" &&
-          "rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
+          "rounded-3xl rounded-b-none border border-b-0 border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
         variant === "section" &&
-          "rounded-2xl border border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-4 sm:px-6 sm:py-5",
+          "rounded-2xl rounded-b-none border border-b-0 border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-4 sm:px-6 sm:py-5",
         className,
       )}
       style={selectorStyle}

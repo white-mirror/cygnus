@@ -161,10 +161,7 @@ export const ControlPanelPage = (): JSX.Element => {
   };
 
   const handleTouchEnd: TouchEventHandler<HTMLDivElement> = () => {
-    if (
-      touchStartXRef.current === null ||
-      touchCurrentXRef.current === null
-    ) {
+    if (touchStartXRef.current === null || touchCurrentXRef.current === null) {
       resetTouchTracking();
       return;
     }
@@ -274,8 +271,8 @@ export const ControlPanelPage = (): JSX.Element => {
 
   const controlSection = (
     <section className="flex w-full flex-col gap-6 max-w-full lg:max-w-[500px]">
-      <div className="flex h-full w-full flex-col rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
-        <header className="flex flex-col gap-2 border-b border-[color:var(--border-soft)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="flex h-full w-full flex-col rounded-3xl border-none bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
+        <header className="flex flex-col gap-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
@@ -300,13 +297,17 @@ export const ControlPanelPage = (): JSX.Element => {
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(var(--action-accent),0.35)] bg-[rgba(var(--action-accent),0.12)] text-[rgb(var(--action-accent))] transition hover:bg-[rgba(var(--action-accent),0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--action-accent),0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60 lg:hidden"
               style={applyButtonStyle}
               aria-label={
-                actualPowerOn ? "Apagar equipo seleccionado" : "Encender equipo seleccionado"
+                actualPowerOn
+                  ? "Apagar equipo seleccionado"
+                  : "Encender equipo seleccionado"
               }
               onClick={() => {
                 handlers.togglePanelPower();
               }}
               disabled={
-                selectedDeviceId === null || isUpdatingDevice || controlsDisabled
+                selectedDeviceId === null ||
+                isUpdatingDevice ||
+                controlsDisabled
               }
             >
               <FontAwesomeIcon icon={faPowerOff} className="h-4 w-4" />
@@ -320,30 +321,30 @@ export const ControlPanelPage = (): JSX.Element => {
           ) : null}
         </header>
 
-        <div className="flex flex-col gap-6 p-4">
+        <div className="flex flex-col gap-4 p-0">
           {errorBanner}
-
-          <ModeSelector
-            activeMode={controlState ? controlState.mode : null}
-            appliedMode={actualMode}
-            controlsDisabled={controlsDisabled}
-            accentPreview={modePreviewColor}
-            onSelect={handlers.selectMode}
-            variant="section"
-            className="h-full"
-          />
-
-          {fanControlVisible ? (
-            <FanSelector
-              actualFanSpeed={actualFanSpeed}
-              pendingFanSpeed={controlState ? controlState.fanSpeed : null}
+          <div>
+            <ModeSelector
+              activeMode={controlState ? controlState.mode : null}
+              appliedMode={actualMode}
               controlsDisabled={controlsDisabled}
-              onSelect={handlers.selectFanSpeed}
+              accentPreview={modePreviewColor}
+              onSelect={handlers.selectMode}
               variant="section"
               className="h-full"
             />
-          ) : null}
 
+            {fanControlVisible ? (
+              <FanSelector
+                actualFanSpeed={actualFanSpeed}
+                pendingFanSpeed={controlState ? controlState.fanSpeed : null}
+                controlsDisabled={controlsDisabled}
+                onSelect={handlers.selectFanSpeed}
+                variant="section"
+                className="h-full border-t-2"
+              />
+            ) : null}
+          </div>
           {temperatureControlVisible ? (
             <TemperatureCard
               currentLabel={currentTemperatureLabel}
