@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChevronDown,
   faChevronLeft,
   faMoon,
   faSignOut,

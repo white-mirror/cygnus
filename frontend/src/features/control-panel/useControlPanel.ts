@@ -235,7 +235,7 @@ export const useControlPanel = (): UseControlPanelResult => {
         return prev;
       });
     },
-    [controlState?.temperature, selectedDeviceId, selectedHomeId],
+    [controlState, selectedDeviceId, selectedHomeId],
   );
 
   const handleCommandError = useCallback(
