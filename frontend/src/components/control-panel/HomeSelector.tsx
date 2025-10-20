@@ -23,7 +23,7 @@ export const HomeSelector: FC<HomeSelectorProps> = ({
   };
 
   return (
-    <section className="rounded-3xl border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 p-4 backdrop-blur-sm">
+    <section className="px-4">
       <div className="mb-2 text-sm font-medium text-[color:var(--text-secondary)]">
         Seleccionar hogar
       </div>
