@@ -273,7 +273,7 @@ export const ControlPanelPage = (): JSX.Element => {
     <section className="flex w-full flex-col gap-6 max-w-full lg:max-w-[500px]">
       <div className="flex h-full w-full flex-col rounded-3xl border-none bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
         <header className="flex flex-col gap-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex w-full items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -344,7 +344,6 @@ export const ControlPanelPage = (): JSX.Element => {
                 className="h-full border-t-2"
               />
             ) : null}
-          </div>
           {temperatureControlVisible ? (
             <TemperatureCard
               currentLabel={currentTemperatureLabel}
@@ -358,9 +357,10 @@ export const ControlPanelPage = (): JSX.Element => {
               variant="section"
             />
           ) : null}
+          </div>
         </div>
 
-        <footer className="flex flex-col gap-3 border-t border-[color:var(--border-soft)] bg-[var(--surface)]/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">
+        <footer className="flex flex-col gap-3 bg-[var(--surface)]/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-2 text-sm font-semibold text-[color:var(--text-secondary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--border-soft)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50"
@@ -405,7 +405,7 @@ export const ControlPanelPage = (): JSX.Element => {
       />
 
       <main className="relative z-0 flex flex-1 flex-col px-4 py-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 pb-12 xl:max-w-7xl">
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 pb-6 xl:max-w-7xl">
           <div className="flex flex-1 flex-col gap-6 lg:flex-row lg:items-start lg:justify-center lg:gap-10">
             <div className="lg:hidden">
               <div className="relative w-full overflow-hidden">

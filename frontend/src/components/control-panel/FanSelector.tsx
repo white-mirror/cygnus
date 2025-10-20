@@ -52,16 +52,16 @@ export const FanSelector = ({
   pendingFanSpeed,
   controlsDisabled,
   onSelect,
-  variant = "card",
+  variant = "section",
   className,
 }: FanSelectorProps): JSX.Element => (
   <section
     className={cn(
       "flex h-full w-full flex-col",
       variant === "card" &&
-        "rounded-3xl rounded-t-none border border-t-0 border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
+        "rounded-3xl rounded-t-none rounded-b-none border border-t-0 border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
       variant === "section" &&
-        "rounded-3xl rounded-t-none border border-t-0 border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-4 sm:px-6 sm:py-5",
+        "border-none px-4 mb-4",
       className
     )}
   >

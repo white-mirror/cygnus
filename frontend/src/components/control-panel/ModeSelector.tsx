@@ -61,7 +61,7 @@ export const ModeSelector = ({
   controlsDisabled,
   accentPreview,
   onSelect,
-  variant = "card",
+  variant = "section",
   className,
 }: ModeSelectorProps): JSX.Element => {
   const selectorStyle = {
@@ -75,7 +75,7 @@ export const ModeSelector = ({
         variant === "card" &&
           "rounded-3xl rounded-b-none border border-b-0 border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
         variant === "section" &&
-          "rounded-2xl rounded-b-none border border-b-0 border-[color:var(--border-soft)] bg-[var(--surface)] px-5 py-4 sm:px-6 sm:py-5",
+          "border-none px-4 mb-4",
         className,
       )}
       style={selectorStyle}
