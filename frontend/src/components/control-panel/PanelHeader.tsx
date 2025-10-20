@@ -73,7 +73,7 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-50 border-b border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-xl">
-      <div className="flex w-full flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="flex w-full flex-col gap-3 px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-4">
         <div className="flex w-full flex-wrap items-center gap-3">
           <div className="flex flex-1 items-center gap-3">
             {showBackButton && typeof onBack === "function" ? (

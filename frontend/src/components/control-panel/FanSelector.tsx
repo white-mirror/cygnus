@@ -61,12 +61,12 @@ export const FanSelector = ({
       variant === "card" &&
         "rounded-3xl rounded-t-none rounded-b-none border border-t-0 border-[color:var(--border-soft)] bg-[var(--surface)]/90 p-4 backdrop-blur-md sm:p-6",
       variant === "section" &&
-        "border-none px-4 mb-4",
+        "border-none px-4",
       className
     )}
   >
     <header className="flex flex-col gap-1">
-      <h2 className="text-lg font-semibold text-[color:var(--text-primary)] mb-2">
+      <h2 className="text-base font-semibold text-[color:var(--text-primary)] mb-2">
         Velocidad
       </h2>
       {/* <p className="text-xs text-[color:var(--text-muted)]">

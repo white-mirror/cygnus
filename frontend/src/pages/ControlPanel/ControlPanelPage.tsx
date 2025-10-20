@@ -328,10 +328,10 @@ export const ControlPanelPage = (): JSX.Element => {
   const controlSection = (
     <section className="flex w-full flex-col gap-6 max-w-full lg:max-w-[500px]">
       <div className="flex h-full w-full flex-col rounded-3xl border-none bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
-        <header className="flex flex-col gap-2 px-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <header className="flex flex-col gap-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex w-full items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-[color:var(--text-primary)]">
+              <h1 className="text-xl font-semibold text-[color:var(--text-primary)]">
                 {controlTitle}
               </h1>
             </div>
@@ -367,7 +367,7 @@ export const ControlPanelPage = (): JSX.Element => {
 
         <div className="flex flex-col gap-4 p-0">
           {errorBanner}
-          <div>
+          {/* <div> */}
             <ModeSelector
               activeMode={controlState ? controlState.mode : null}
               appliedMode={actualMode}
@@ -401,7 +401,7 @@ export const ControlPanelPage = (): JSX.Element => {
               variant="section"
             />
           ) : null}
-          </div>
+          {/* </div> */}
         </div>
 
         <footer className="flex flex-col gap-3 bg-[var(--surface)]/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">
