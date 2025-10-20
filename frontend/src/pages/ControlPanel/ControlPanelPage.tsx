@@ -1,25 +1,17 @@
 import type { CSSProperties, JSX, TouchEventHandler } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPowerOff } from "@fortawesome/free-solid-svg-icons";
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 
 import { DeviceList } from "../../components/control-panel/DeviceList";
 import { FanSelector } from "../../components/control-panel/FanSelector";
 import { HomeSelector } from "../../components/control-panel/HomeSelector";
 import { ModeSelector } from "../../components/control-panel/ModeSelector";
-import {
-  PanelHeader,
-  type PanelHeaderNavItem,
-} from "../../components/control-panel/PanelHeader";
+import { PanelHeader } from "../../components/control-panel/PanelHeader";
 import { TemperatureCard } from "../../components/control-panel/TemperatureCard";
 import { TEMPERATURE_STEP } from "../../features/control-panel/constants";
 import { useControlPanel } from "../../features/control-panel/useControlPanel";
-
-const NAV_ITEMS: PanelHeaderNavItem[] = [
-  { id: "home", label: "Inicio" },
-  { id: "control", label: "Control" },
-  { id: "history", label: "Historial" },
-];
+import { formatHomeName } from "../../features/control-panel/utils";
 
 const USER_PROFILE = {
   name: "Ana Martinez",
@@ -64,8 +56,14 @@ export const ControlPanelPage = (): JSX.Element => {
 
     return initialTheme;
   });
-  const [activeTab, setActiveTab] = useState<string>("control");
   const [activeMobileSlide, setActiveMobileSlide] = useState<number>(0);
+  const [isLargeScreen, setIsLargeScreen] = useState<boolean>(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.matchMedia("(min-width: 1024px)").matches;
+  });
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
 
@@ -82,6 +80,44 @@ export const ControlPanelPage = (): JSX.Element => {
       }
     }
   }, [theme]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const handleMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      if ("matches" in event) {
+        setIsLargeScreen(event.matches);
+        return;
+      }
+
+      setIsLargeScreen(mediaQuery.matches);
+    };
+
+    setIsLargeScreen(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleMediaChange);
+    } else if (typeof mediaQuery.addListener === "function") {
+      mediaQuery.addListener(handleMediaChange);
+    }
+
+    return () => {
+      if (typeof mediaQuery.removeEventListener === "function") {
+        mediaQuery.removeEventListener("change", handleMediaChange);
+      } else if (typeof mediaQuery.removeListener === "function") {
+        mediaQuery.removeListener(handleMediaChange);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isLargeScreen) {
+      setActiveMobileSlide(1);
+    }
+  }, [isLargeScreen]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -188,6 +224,8 @@ export const ControlPanelPage = (): JSX.Element => {
     devices,
     selectedHomeId,
     selectedDeviceId,
+    selectedHome,
+    selectedDevice,
     actualPowerOn,
     controlState,
     isFetchingHomes,
@@ -225,6 +263,24 @@ export const ControlPanelPage = (): JSX.Element => {
       }) as CSSProperties,
     [confirmAccentColor]
   );
+
+  const selectedHomeName = selectedHome ? formatHomeName(selectedHome) : null;
+  const selectedDeviceName = (() => {
+    const name =
+      typeof selectedDevice?.deviceName === "string"
+        ? selectedDevice.deviceName.trim()
+        : "";
+
+    return name.length > 0 ? name : null;
+  })();
+  const controlTitle =
+    [selectedHomeName, selectedDeviceName].filter(Boolean).join(" / ") ||
+    "Panel de Control";
+  const isControlViewActive = isLargeScreen
+    ? selectedDeviceId !== null
+    : activeMobileSlide === 1;
+  const shouldShowBackButton = !isLargeScreen && activeMobileSlide === 1;
+  const topBarTitle = isControlViewActive ? "Control" : "Dispositivos";
 
   const handleLogout = (): void => {
     // Placeholder for the real logout flow
@@ -272,23 +328,11 @@ export const ControlPanelPage = (): JSX.Element => {
   const controlSection = (
     <section className="flex w-full flex-col gap-6 max-w-full lg:max-w-[500px]">
       <div className="flex h-full w-full flex-col rounded-3xl border-none bg-[var(--surface)]/92 backdrop-blur-md shadow-sm">
-        <header className="flex flex-col gap-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <header className="flex flex-col gap-2 px-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex w-full items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface)] text-[color:var(--text-primary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--border-soft)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60 lg:hidden"
-                aria-label="Volver a la selección"
-                onClick={() => {
-                  goToPreviousSlide();
-                }}
-                disabled={activeMobileSlide === 0}
-              >
-                <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-              </button>
-
               <h1 className="text-2xl font-semibold text-[color:var(--text-primary)]">
-                Panel de Control
+                {controlTitle}
               </h1>
             </div>
 
@@ -394,9 +438,11 @@ export const ControlPanelPage = (): JSX.Element => {
       style={accentStyle}
     >
       <PanelHeader
-        navItems={NAV_ITEMS}
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        title={topBarTitle}
+        showBackButton={shouldShowBackButton}
+        onBack={() => {
+          goToMobileSlide(0);
+        }}
         theme={theme}
         onToggleTheme={toggleTheme}
         userName={USER_PROFILE.name}

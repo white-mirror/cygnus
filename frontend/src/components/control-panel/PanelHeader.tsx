@@ -2,18 +2,13 @@ import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faMoon, faSignOut, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronLeft, faMoon, faSignOut, faSun } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "../../lib/cn";
 
-export type PanelHeaderNavItem = {
-  id: string;
-  label: string;
-};
-
 type PanelHeaderProps = {
-  navItems: PanelHeaderNavItem[];
-  activeTab: string;
-  onSelectTab: (id: string) => void;
+  title: string;
+  showBackButton?: boolean;
+  onBack?: () => void;
   theme: "light" | "dark";
   onToggleTheme: () => void;
   userName: string;
@@ -21,49 +16,10 @@ type PanelHeaderProps = {
   onLogout: () => void;
 };
 
-type NavTabsProps = {
-  navItems: PanelHeaderNavItem[];
-  activeTab: string;
-  onSelectTab: (id: string) => void;
-  className?: string;
-};
-
-const NavTabs: FC<NavTabsProps> = ({
-  navItems,
-  activeTab,
-  onSelectTab,
-  className,
-}) => (
-  <nav
-    className={cn(
-      "flex shrink-0 items-center gap-2 overflow-x-auto pr-1 justify-start",
-      className,
-    )}
-    aria-label="Páginas de la aplicación"
-  >
-    {navItems.map((item) => (
-      <button
-        key={item.id}
-        type="button"
-        className={cn(
-          "rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200",
-          activeTab === item.id
-            ? "bg-[rgba(var(--accent-color),0.16)] text-[rgb(var(--accent-color))]"
-            : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]",
-        )}
-        onClick={() => onSelectTab(item.id)}
-        aria-current={activeTab === item.id ? "page" : undefined}
-      >
-        {item.label}
-      </button>
-    ))}
-  </nav>
-);
-
 export const PanelHeader: FC<PanelHeaderProps> = ({
-  navItems,
-  activeTab,
-  onSelectTab,
+  title,
+  showBackButton = false,
+  onBack,
   theme,
   onToggleTheme,
   userName,
@@ -119,12 +75,22 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
     <header className="sticky top-0 z-50 border-b border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-xl">
       <div className="flex w-full flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex w-full flex-wrap items-center gap-3">
-          <NavTabs
-            navItems={navItems}
-            activeTab={activeTab}
-            onSelectTab={onSelectTab}
-            className="flex-1 min-w-0 justify-start"
-          />
+          <div className="flex flex-1 items-center gap-3">
+            {showBackButton && typeof onBack === "function" ? (
+              <button
+                type="button"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface)] text-[color:var(--text-primary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                aria-label="Volver"
+                onClick={onBack}
+              >
+                <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4" />
+              </button>
+            ) : null}
+
+            <h1 className="text-lg font-semibold text-[color:var(--text-primary)] sm:text-xl">
+              {title}
+            </h1>
+          </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-3">
             <div ref={menuRef} className="relative">
