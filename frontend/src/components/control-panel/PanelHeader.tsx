@@ -2,7 +2,13 @@ import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronLeft, faMoon, faSignOut, faSun } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faChevronLeft,
+  faMoon,
+  faSignOut,
+  faSun,
+} from "@fortawesome/free-solid-svg-icons";
 import { cn } from "../../lib/cn";
 
 type PanelHeaderProps = {
@@ -69,36 +75,40 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
     : "Abrir menú de usuario";
 
   const actionBaseClasses =
-    "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
+    // "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
+    "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
 
   return (
     <header className="sticky top-0 z-50 border-b border-[color:var(--border-soft)] bg-[var(--surface)]/92 backdrop-blur-xl">
-      <div className="flex w-full flex-col gap-3 px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-4">
+      <div className="flex w-full flex-col gap-3 px-1 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-4">
         <div className="flex w-full flex-wrap items-center gap-3">
-          <div className="flex flex-1 items-center gap-3">
+          <div className="flex flex-1 items-center">
             {showBackButton && typeof onBack === "function" ? (
               <button
                 type="button"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border-soft)] bg-[var(--surface)] text-[color:var(--text-primary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border-soft)] text-[color:var(--text-primary)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
                 aria-label="Volver"
                 onClick={onBack}
               >
                 <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4" />
               </button>
-            ) : null}
+            ) : (
+              <span className="w-10" aria-hidden="true" />
+            )}
 
             <h1 className="text-lg font-semibold text-[color:var(--text-primary)] sm:text-xl">
               {title}
             </h1>
           </div>
 
-          <div className="ml-auto flex shrink-0 items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-3 pr-2">
             <div ref={menuRef} className="relative">
               <button
                 type="button"
                 className={cn(
                   actionBaseClasses,
-                  "h-11 items-center gap-2 border-transparent bg-[var(--surface)] px-2 pl-2 pr-3 text-[color:var(--text-secondary)]",
+                  "h-12 w-12 rounded-full border-transparent text-[color:var(--text-secondary)] p-0",
+                  isUserMenuOpen ? "bg-[var(--surface-subtle)]" : "hover:bg-[var(--surface)]",
                 )}
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
                 aria-haspopup="menu"
@@ -106,17 +116,17 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
                 aria-label={profileMenuLabel}
                 title={profileMenuLabel}
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.2)] text-sm font-semibold tracking-wide text-[rgb(var(--accent-color))]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.2)] text-sm font-semibold tracking-wide text-[rgb(var(--accent-color))]">
                   {userInitials}
                 </span>
-                <FontAwesomeIcon
+                {/* <FontAwesomeIcon
                   icon={faChevronDown}
                   className={cn(
                     "h-3 w-3 transition-transform duration-200",
                     isUserMenuOpen && "rotate-180",
                   )}
                   aria-hidden="true"
-                />
+                /> */}
               </button>
 
               {isUserMenuOpen && (
