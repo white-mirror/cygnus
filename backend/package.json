@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "cygnus-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API de Cygnus construida con Express y TypeScript.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

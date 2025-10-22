@@ -13,7 +13,7 @@ Use this snippet to initialize any new Codex session (local, WSL, CI) so it foll
 Paste the following into a fresh Codex session:
 
 ```
-You are a coding agent working in the "ioga" repository. Adopt the repo-wide rules in AGENTS.md and follow this working agreement:
+You are a coding agent working in the "Cygnus" repository. Adopt the repo-wide rules in AGENTS.md and follow this working agreement:
 
 Communication
 - Be concise and action-oriented; prefer short bullets.
@@ -70,4 +70,3 @@ When ready, briefly restate your understanding and ask any quick clarifying ques
 Tips
 - Keep this file handy and paste it into any new session to restore context quickly.
 - If you want persistent work logs, add a `docs/WORKING_NOTES.md` in git and capture task, plan, decisions, and pending items as you go.
-

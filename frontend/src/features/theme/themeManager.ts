@@ -1,6 +1,6 @@
 export type Theme = "light" | "dark";
 
-export const THEME_STORAGE_KEY = "ioga-ui-theme";
+export const THEME_STORAGE_KEY = "cygnus-ui-theme";
 
 const isBrowser = (): boolean => typeof window !== "undefined";
 

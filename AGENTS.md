@@ -88,10 +88,10 @@
 approval_policy = "never"
 sandbox_mode = "workspace-write"
 
-[projects."/mnt/g/Projects/ioga"]
+[projects."/mnt/g/Projects/Cygnus"]
 profile = "repo_no_prompts"
 
-[projects.'\\?\G:\Projects\ioga']
+[projects.'\\?\G:\Projects\Cygnus']
 profile = "repo_no_prompts"
 ```
 

@@ -1,8 +1,9 @@
 {
-  "name": "frontend",
+  "name": "cygnus-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Interfaz web de Cygnus basada en React y Vite.",
   "scripts": {
     "dev": "vite",
     "host": "vite --host",

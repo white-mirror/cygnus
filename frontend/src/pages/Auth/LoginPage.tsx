@@ -122,7 +122,7 @@ export const LoginPage = (): JSX.Element => {
               Bienvenida/o
             </span>
             <h1 className="text-3xl font-bold sm:text-4xl">
-              Ingresá a tu panel de ioga
+              Ingresá a tu panel de Cygnus
             </h1>
             <p className="max-w-md text-sm leading-relaxed text-[color:var(--text-secondary)] sm:text-base">
               Controlá tus dispositivos desde un solo lugar. Iniciá sesión con tu

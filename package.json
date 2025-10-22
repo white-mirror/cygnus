@@ -1,7 +1,7 @@
 {
-  "name": "projects",
+  "name": "cygnus",
   "version": "1.0.0",
-  "description": "",
+  "description": "Monorepo de Cygnus: plataforma para administrar dispositivos con un backend Express y un frontend React.",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
