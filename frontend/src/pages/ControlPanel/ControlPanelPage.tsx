@@ -12,50 +12,29 @@ import { TemperatureCard } from "../../components/control-panel/TemperatureCard"
 import { TEMPERATURE_STEP } from "../../features/control-panel/constants";
 import { useControlPanel } from "../../features/control-panel/useControlPanel";
 import { formatHomeName } from "../../features/control-panel/utils";
-
-const USER_PROFILE = {
-  name: "Ana Martinez",
-  initials: "AM",
-};
-
-const THEME_STORAGE_KEY = "ioga-ui-theme";
-
-const readStoredTheme = (): "light" | "dark" => {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  try {
-    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-
-    if (storedTheme === "light" || storedTheme === "dark") {
-      return storedTheme;
-    }
-  } catch {
-    // Ignore storage access issues (e.g., private browsing modes)
-  }
-
-  if (
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  ) {
-    return "dark";
-  }
-
-  return "light";
-};
+import { useAuth } from "../../features/auth/useAuth";
+import {
+  applyTheme,
+  THEME_STORAGE_KEY,
+  resolveInitialTheme,
+  type Theme,
+} from "../../features/theme/themeManager";
 
 export const ControlPanelPage = (): JSX.Element => {
+  const { user, logout } = useAuth();
   const { state, handlers } = useControlPanel();
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    const initialTheme = readStoredTheme();
-
-    if (typeof document !== "undefined") {
-      document.documentElement.dataset.theme = initialTheme;
+  const userEmail = user?.email ?? "";
+  const userInitials = useMemo(() => {
+    if (!userEmail) {
+      return "--";
     }
 
-    return initialTheme;
-  });
+    const localPart = userEmail.split("@")[0] ?? userEmail;
+    const alphanumeric = localPart.replace(/[^a-zA-Z0-9]/g, "");
+    const initialsSource = alphanumeric.length > 0 ? alphanumeric : localPart;
+    return initialsSource.slice(0, 2).toUpperCase();
+  }, [userEmail]);
+  const [theme, setTheme] = useState<Theme>(() => resolveInitialTheme());
   const [activeMobileSlide, setActiveMobileSlide] = useState<number>(0);
   const [isLargeScreen, setIsLargeScreen] = useState<boolean>(() => {
     if (typeof window === "undefined") {
@@ -68,17 +47,7 @@ export const ControlPanelPage = (): JSX.Element => {
   const touchCurrentXRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.dataset.theme = theme;
-    }
-
-    if (typeof window !== "undefined") {
-      try {
-        window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-      } catch {
-        // Ignore storage access issues
-      }
-    }
+    applyTheme(theme);
   }, [theme]);
 
   useEffect(() => {
@@ -283,8 +252,7 @@ export const ControlPanelPage = (): JSX.Element => {
   const topBarTitle = isControlViewActive ? "Control" : "Dispositivos";
 
   const handleLogout = (): void => {
-    // Placeholder for the real logout flow
-    console.info("Logout action requested");
+    void logout();
   };
 
   const handleSelectDevice = (deviceId: number): void => {
@@ -445,8 +413,8 @@ export const ControlPanelPage = (): JSX.Element => {
         }}
         theme={theme}
         onToggleTheme={toggleTheme}
-        userName={USER_PROFILE.name}
-        userInitials={USER_PROFILE.initials}
+        userName={userEmail || "Usuario"}
+        userInitials={userInitials}
         onLogout={handleLogout}
       />
 

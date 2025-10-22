@@ -1,3 +1,5 @@
+import { ApiError, UnauthorizedError } from "./errors";
+
 const API_BASE = "/api/bgh";
 
 type LogMeta = Record<string, unknown>;
@@ -56,9 +58,16 @@ async function handleResponse<T>(response: Response): Promise<T> {
       const errorBody = (await response.json()) as { message?: string };
       const message =
         errorBody?.message ?? "Solicitud rechazada por el servidor";
-      throw new Error(message);
+      if (response.status === 401) {
+        throw new UnauthorizedError(message);
+      }
+      throw new ApiError(message, response.status, errorBody);
     }
-    throw new Error(`Solicitud fallida con estado ${response.status}`);
+    const fallbackMessage = `Solicitud fallida con estado ${response.status}`;
+    if (response.status === 401) {
+      throw new UnauthorizedError(fallbackMessage);
+    }
+    throw new ApiError(fallbackMessage, response.status);
   }
 
   if (!isJson) {
@@ -76,7 +85,10 @@ async function request<T>(
   const url = `${API_BASE}${path}`;
   console.info("[api:bgh] request:start", { url, ...meta });
   try {
-    const response = await fetch(url, init);
+    const response = await fetch(url, {
+      ...init,
+      credentials: "include",
+    });
     const status = response.status;
     console.info("[api:bgh] request:response", { url, status, ...meta });
     try {

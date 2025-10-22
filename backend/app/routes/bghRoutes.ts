@@ -6,8 +6,11 @@ import {
   setDeviceMode,
   streamDeviceEvents,
 } from "../../src/controllers/bghController";
+import { requireAuth } from "../../src/middleware/requireAuth";
 
 const router = Router();
+
+router.use(requireAuth);
 
 router.get("/homes", listHomes);
 router.get("/homes/:homeId/devices", listDevices);

@@ -10,6 +10,7 @@ import pinoHttp from "pino-http";
 import type { Logger } from "pino";
 import logger from "./logger";
 import bghRoutes from "app/routes/bghRoutes";
+import authRoutes from "app/routes/authRoutes";
 
 type LoggedRequest = Request & { log: Logger };
 
@@ -42,9 +43,15 @@ app.use(
   }),
 );
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
+app.use("/api/auth", authRoutes);
 app.use("/api/bgh", bghRoutes);
 
 app.get("/api/ping", (req: Request, res: Response) => {

@@ -14,6 +14,7 @@ import {
   type CommandPayload,
 } from "../services/commandQueue";
 import { registerClient } from "../services/eventStream";
+import type { AuthenticatedRequest } from "../middleware/requireAuth";
 
 type LoggedRequest = Request & { log: Logger };
 
@@ -25,7 +26,15 @@ type Controller = (
 
 const getRequestLogger = (req: Request): Logger => {
   const request = req as LoggedRequest;
-  return request.log ?? logger;
+  const baseLogger = request.log ?? logger;
+  const authenticated = req as Partial<AuthenticatedRequest> & LoggedRequest;
+  const userEmail = authenticated.auth?.email;
+
+  if (userEmail) {
+    return baseLogger.child({ userEmail });
+  }
+
+  return baseLogger;
 };
 
 const sendServiceError = (

@@ -7,6 +7,8 @@ import {
   type DeviceStatusDTO,
   type HomeSummary,
 } from "../../api/bgh";
+import { isUnauthorizedError } from "../../api/errors";
+import { useAuth } from "../auth/useAuth";
 import {
   ACCENT_BY_MODE,
   ACCENT_OFF,
@@ -100,6 +102,7 @@ export interface UseControlPanelResult {
 }
 
 export const useControlPanel = (): UseControlPanelResult => {
+  const { logout } = useAuth();
   const selectionRef = useRef<StoredSelection | null>(readStoredSelection());
 
   const [homes, setHomes] = useState<HomeSummary[]>([]);
@@ -298,6 +301,11 @@ export const useControlPanel = (): UseControlPanelResult => {
           return;
         }
 
+        if (isUnauthorizedError(error)) {
+          void logout();
+          return;
+        }
+
         const message =
           error instanceof Error
             ? error.message
@@ -314,7 +322,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     return () => {
       isActive = false;
     };
-  }, [persistSelection]);
+  }, [logout, persistSelection]);
 
   useEffect(() => {
     if (selectedHomeId === null) {
@@ -369,6 +377,11 @@ export const useControlPanel = (): UseControlPanelResult => {
           return;
         }
 
+        if (isUnauthorizedError(error)) {
+          void logout();
+          return;
+        }
+
         const message =
           error instanceof Error
             ? error.message
@@ -388,7 +401,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     return () => {
       isActive = false;
     };
-  }, [persistSelection, selectedHomeId]);
+  }, [logout, persistSelection, selectedHomeId]);
 
   const selectedHome = useMemo(
     () => homes.find((home) => home.HomeID === selectedHomeId) ?? null,
@@ -584,6 +597,13 @@ export const useControlPanel = (): UseControlPanelResult => {
           deviceId,
         });
       } catch (error) {
+        if (isUnauthorizedError(error)) {
+          setStatusMessage(null);
+          setIsUpdatingDevice(false);
+          void logout();
+          return;
+        }
+
         const message =
           error instanceof Error
             ? error.message
@@ -594,7 +614,7 @@ export const useControlPanel = (): UseControlPanelResult => {
         setIsUpdatingDevice(false);
       }
     },
-    [actualTargetTemperature, selectedHomeId],
+    [actualTargetTemperature, logout, selectedHomeId],
   );
 
   const selectHome = useCallback(
@@ -764,6 +784,13 @@ export const useControlPanel = (): UseControlPanelResult => {
         deviceId: selectedDeviceId,
       });
     } catch (error) {
+      if (isUnauthorizedError(error)) {
+        setStatusMessage(null);
+        setIsUpdatingDevice(false);
+        void logout();
+        return;
+      }
+
       const message =
         error instanceof Error ? error.message : "No se pudo enviar el comando";
 
@@ -774,6 +801,7 @@ export const useControlPanel = (): UseControlPanelResult => {
   }, [
     controlState,
     hasPendingChanges,
+    logout,
     selectedDeviceId,
     selectedHomeId,
   ]);

@@ -38,6 +38,8 @@
     --shadow-elevated: 0 24px 60px rgba(31, 48, 94, 0.12);
     --accent-color: 43, 139, 255;
     --confirm-accent: 43, 139, 255;
+    --surface-glass: rgba(255, 255, 255, 0.82);
+    --surface-input: rgba(255, 255, 255, 0.9);
     --background-gradient:
       radial-gradient(
         120% 120% at 15% 10%,
@@ -64,6 +66,8 @@
     --text-secondary: #cbd5f5;
     --text-muted: #93a1c1;
     --shadow-elevated: 0 24px 60px rgba(6, 12, 24, 0.55);
+    --surface-glass: rgba(17, 28, 47, 0.88);
+    --surface-input: rgba(22, 35, 59, 0.94);
     --background-gradient:
       radial-gradient(
         120% 120% at 15% 10%,
