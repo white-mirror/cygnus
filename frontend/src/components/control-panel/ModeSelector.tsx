@@ -84,12 +84,8 @@ export const ModeSelector = ({
         <h2 className="text-base font-semibold text-[color:var(--text-primary)] mb-2">
           Modo
         </h2>
-        {/* <p className="text-xs text-[color:var(--text-muted)]">
-          Define la configuracion principal del equipo
-        </p> */}
       </header>
 
-      {/* <div className="grid gap-1 grid-cols-5"> */}
       <div className="flex flex-row justify-between gap-3 w-min ml-auto">
         {MODE_OPTIONS.map((option) => {
           const isSelected = activeMode === option.id;

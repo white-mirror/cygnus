@@ -9,31 +9,26 @@ import { cn } from "../../lib/cn";
 const FAN_OPTIONS: Array<{
   id: FanSpeed;
   label: string;
-  // sublabel: string;
   icon: IconDefinition;
 }> = [
   {
     id: "auto",
     label: "Auto",
-    // sublabel: "Automatico",
     icon: faA,
   },
   {
     id: "low",
     label: "Baja",
-    // sublabel: "Baja",
     icon: fa1,
   },
   {
     id: "medium",
     label: "Media",
-    // sublabel: "Media",
     icon: fa2,
   },
   {
     id: "high",
     label: "Alta",
-    // sublabel: "Alta",
     icon: fa3,
   },
 ];
@@ -69,12 +64,8 @@ export const FanSelector = ({
       <h2 className="text-base font-semibold text-[color:var(--text-primary)] mb-2">
         Velocidad
       </h2>
-      {/* <p className="text-xs text-[color:var(--text-muted)]">
-        Ajusta la intensidad del flujo de aire
-      </p> */}
     </header>
 
-    {/* <div className="grid gap-1 grid-cols-4"> */}
     <div className="flex flex-row justify-between gap-3 w-min ml-auto">
       {FAN_OPTIONS.map((option) => {
         const isActive = actualFanSpeed === option.id;
@@ -133,16 +124,7 @@ export const FanSelector = ({
               >
                 {option.label}
               </span>
-              <span className="text-xs text-[color:var(--text-muted)]">
-                {/* {option.sublabel} */}
-              </span>
             </span>
-
-            {/* {isPending && (
-              <span className="mt-2 rounded-full border border-[rgba(var(--accent-color),0.35)] bg-[rgba(var(--accent-color),0.18)] px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-[rgb(var(--accent-color))]">
-                Pendiente
-              </span>
-            )} */}
           </button>
         );
       })}

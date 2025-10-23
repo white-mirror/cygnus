@@ -19,7 +19,6 @@ type TemperatureCardProps = {
   targetLabel: string;
   temperatureValue: number | null;
   controlsDisabled: boolean;
-  // temperatureTrend: string;
   onIncrease: () => void;
   onDecrease: () => void;
   onChange: (value: number) => void;
@@ -32,7 +31,6 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
   targetLabel,
   temperatureValue,
   controlsDisabled,
-  // temperatureTrend,
   onIncrease,
   onDecrease,
   onChange,
@@ -68,21 +66,6 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
         className,
       )}
     >
-      {/* <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-            Control
-          </h2>
-          <p className="text-xs text-[color:var(--text-muted)]">
-            Ajusta la climatización de forma precisa
-          </p>
-        </div>
-
-        <div className="rounded-full border border-[color:var(--border-soft)] bg-[var(--surface-soft)]/80 px-4 py-2 text-xs font-semibold tracking-wide text-[color:var(--text-secondary)]">
-          {temperatureTrend}
-        </div>
-      </header> */}
-
       <div className="flex flex-col gap-4 w-auto">
         <div className="flex flex-col gap-4 rounded-2xl border border-[rgba(var(--accent-color),0.18)] bg-[rgba(var(--accent-color),0.08)] px-4 py-4">
           <div className="flex items-center gap-3">
@@ -106,9 +89,6 @@ export const TemperatureCard: FC<TemperatureCardProps> = ({
 
           <div className="flex items-center gap-4 rounded-2xl ml-auto text-[color:var(--text-primary)]" role="group" aria-label="Control de temperatura objetivo">
             <div className="flex flex-col gap-1">
-              {/* <span className="text-xs font-semibold tracking-wide text-[color:var(--text-muted)]">
-                Control
-              </span> */}
               <div className="flex items-baseline gap-2">
                 <span className="digital-display text-8xl font-semibold leading-none text-[rgb(var(--accent-color))] sm:text-9xl">
                   {targetLabel}

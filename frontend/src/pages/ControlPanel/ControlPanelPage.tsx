@@ -206,7 +206,6 @@ export const ControlPanelPage = (): JSX.Element => {
     actualFanSpeed,
     fanControlVisible,
     temperatureControlVisible,
-    // temperatureTrend,
     currentTemperatureLabel,
     targetTemperatureLabel,
     hasPendingChanges,
@@ -335,41 +334,38 @@ export const ControlPanelPage = (): JSX.Element => {
 
         <div className="flex flex-col gap-4 p-0">
           {errorBanner}
-          {/* <div> */}
-            <ModeSelector
-              activeMode={controlState ? controlState.mode : null}
-              appliedMode={actualMode}
-              controlsDisabled={controlsDisabled}
-              accentPreview={modePreviewColor}
-              onSelect={handlers.selectMode}
-              variant="section"
-              className="h-full"
-            />
+          <ModeSelector
+            activeMode={controlState ? controlState.mode : null}
+            appliedMode={actualMode}
+            controlsDisabled={controlsDisabled}
+            accentPreview={modePreviewColor}
+            onSelect={handlers.selectMode}
+            variant="section"
+            className="h-full"
+          />
 
-            {fanControlVisible ? (
-              <FanSelector
-                actualFanSpeed={actualFanSpeed}
-                pendingFanSpeed={controlState ? controlState.fanSpeed : null}
-                controlsDisabled={controlsDisabled}
-                onSelect={handlers.selectFanSpeed}
-                variant="section"
-                className="h-full border-t-2"
-              />
-            ) : null}
+          {fanControlVisible ? (
+            <FanSelector
+              actualFanSpeed={actualFanSpeed}
+              pendingFanSpeed={controlState ? controlState.fanSpeed : null}
+              controlsDisabled={controlsDisabled}
+              onSelect={handlers.selectFanSpeed}
+              variant="section"
+              className="h-full border-t-2"
+            />
+          ) : null}
           {temperatureControlVisible ? (
             <TemperatureCard
               currentLabel={currentTemperatureLabel}
               targetLabel={targetTemperatureLabel}
               temperatureValue={controlState ? controlState.temperature : null}
               controlsDisabled={controlsDisabled}
-              // temperatureTrend={temperatureTrend}
               onIncrease={() => handlers.adjustTemperature(TEMPERATURE_STEP)}
               onDecrease={() => handlers.adjustTemperature(-TEMPERATURE_STEP)}
               onChange={handlers.setTemperature}
               variant="section"
             />
           ) : null}
-          {/* </div> */}
         </div>
 
         <footer className="flex flex-col gap-3 bg-[var(--surface)]/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">

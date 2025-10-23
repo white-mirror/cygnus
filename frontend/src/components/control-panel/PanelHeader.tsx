@@ -74,7 +74,6 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
     : "Abrir menú de usuario";
 
   const actionBaseClasses =
-    // "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
     "inline-flex items-center justify-center rounded-full border border-[color:var(--border-soft)] text-[color:var(--text-secondary)] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-color))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-60 transform-gpu will-change-transform";
 
   return (
@@ -118,14 +117,6 @@ export const PanelHeader: FC<PanelHeaderProps> = ({
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--accent-color),0.2)] text-sm font-semibold tracking-wide text-[rgb(var(--accent-color))]">
                   {userInitials}
                 </span>
-                {/* <FontAwesomeIcon
-                  icon={faChevronDown}
-                  className={cn(
-                    "h-3 w-3 transition-transform duration-200",
-                    isUserMenuOpen && "rotate-180",
-                  )}
-                  aria-hidden="true"
-                /> */}
               </button>
 
               {isUserMenuOpen && (
