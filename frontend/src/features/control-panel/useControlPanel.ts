@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  fetchDeviceStatus,
   fetchDevices,
   fetchHomes,
   updateDeviceMode,
@@ -121,6 +122,17 @@ export const useControlPanel = (): UseControlPanelResult => {
   const [isFetchingHomes, setIsFetchingHomes] = useState<boolean>(false);
   const [isFetchingDevices, setIsFetchingDevices] = useState<boolean>(false);
   const [isUpdatingDevice, setIsUpdatingDevice] = useState<boolean>(false);
+
+  const selectedHomeIdRef = useRef<number | null>(selectedHomeId);
+  const selectedDeviceIdRef = useRef<number | null>(selectedDeviceId);
+
+  useEffect(() => {
+    selectedHomeIdRef.current = selectedHomeId;
+  }, [selectedHomeId]);
+
+  useEffect(() => {
+    selectedDeviceIdRef.current = selectedDeviceId;
+  }, [selectedDeviceId]);
 
   const persistSelection = useCallback(
     (homeId: number | null, deviceId: number | null): void => {
@@ -262,6 +274,111 @@ export const useControlPanel = (): UseControlPanelResult => {
     [selectedDeviceId, selectedHomeId],
   );
 
+  const applySnapshotRef = useRef(applySnapshot);
+  useEffect(() => {
+    applySnapshotRef.current = applySnapshot;
+  }, [applySnapshot]);
+
+  const handleCommandErrorRef = useRef(handleCommandError);
+  useEffect(() => {
+    handleCommandErrorRef.current = handleCommandError;
+  }, [handleCommandError]);
+
+  const refreshDevices = useCallback(async () => {
+    const targetHomeId = selectedHomeIdRef.current;
+    if (targetHomeId === null) {
+      return;
+    }
+
+    try {
+      const result = await fetchDevices(targetHomeId);
+      const sorted = [...result].sort((a, b) =>
+        a.deviceName.localeCompare(b.deviceName, "es", {
+          sensitivity: "base",
+        }),
+      );
+
+      if (selectedHomeIdRef.current !== targetHomeId) {
+        return;
+      }
+
+      setDevices(sorted);
+
+      const currentSelected = selectedDeviceIdRef.current;
+      const resolvedDeviceId =
+        currentSelected !== null &&
+        sorted.some((device) => device.deviceId === currentSelected)
+          ? currentSelected
+          : sorted[0]?.deviceId ?? null;
+
+      if (selectedDeviceIdRef.current !== resolvedDeviceId) {
+        setSelectedDeviceId(resolvedDeviceId);
+      }
+
+      selectedDeviceIdRef.current = resolvedDeviceId;
+      persistSelection(targetHomeId, resolvedDeviceId);
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        void logout();
+        return;
+      }
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudieron actualizar los equipos";
+      setErrorMessage(message);
+    }
+  }, [logout, persistSelection]);
+
+  const refreshSelectedDevice = useCallback(async () => {
+    const targetHomeId = selectedHomeIdRef.current;
+    const targetDeviceId = selectedDeviceIdRef.current;
+
+    if (targetHomeId === null || targetDeviceId === null) {
+      return;
+    }
+
+    try {
+      const device = await fetchDeviceStatus(targetHomeId, targetDeviceId);
+
+      if (
+        selectedHomeIdRef.current !== targetHomeId ||
+        selectedDeviceIdRef.current !== targetDeviceId
+      ) {
+        return;
+      }
+
+      if (!device) {
+        await refreshDevices();
+        return;
+      }
+
+      applySnapshot(targetHomeId, device, null);
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        void logout();
+        return;
+      }
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo actualizar el estado del equipo";
+      setErrorMessage(message);
+    }
+  }, [applySnapshot, logout, refreshDevices]);
+
+  const refreshDevicesRef = useRef(refreshDevices);
+  useEffect(() => {
+    refreshDevicesRef.current = refreshDevices;
+  }, [refreshDevices]);
+
+  const refreshSelectedDeviceRef = useRef(refreshSelectedDevice);
+  useEffect(() => {
+    refreshSelectedDeviceRef.current = refreshSelectedDevice;
+  }, [refreshSelectedDevice]);
+
   useEffect(() => {
     let isActive = true;
 
@@ -278,6 +395,8 @@ export const useControlPanel = (): UseControlPanelResult => {
         if (result.length === 0) {
           setSelectedHomeId(null);
           setSelectedDeviceId(null);
+          selectedHomeIdRef.current = null;
+          selectedDeviceIdRef.current = null;
           persistSelection(null, null);
           return;
         }
@@ -289,11 +408,14 @@ export const useControlPanel = (): UseControlPanelResult => {
           result.some((home) => home.HomeID === storedHomeId)
         ) {
           setSelectedHomeId(storedHomeId);
+          selectedHomeIdRef.current = storedHomeId;
           return;
         }
 
         const fallbackHomeId = result[0].HomeID;
         setSelectedHomeId(fallbackHomeId);
+        selectedHomeIdRef.current = fallbackHomeId;
+        selectedDeviceIdRef.current = null;
         persistSelection(fallbackHomeId, null);
       })
       .catch((error: unknown) => {
@@ -328,6 +450,7 @@ export const useControlPanel = (): UseControlPanelResult => {
     if (selectedHomeId === null) {
       setDevices([]);
       setSelectedDeviceId(null);
+      selectedDeviceIdRef.current = null;
       setControlState(null);
       setBaselineState(null);
       setLiveTemperature(null);
@@ -370,6 +493,7 @@ export const useControlPanel = (): UseControlPanelResult => {
             : (sorted[0]?.deviceId ?? null);
 
         setSelectedDeviceId(nextDeviceId);
+        selectedDeviceIdRef.current = nextDeviceId;
         persistSelection(selectedHomeId, nextDeviceId ?? null);
       })
       .catch((error: unknown) => {
@@ -390,6 +514,7 @@ export const useControlPanel = (): UseControlPanelResult => {
         setErrorMessage(message);
         setDevices([]);
         setSelectedDeviceId(null);
+        selectedDeviceIdRef.current = null;
         persistSelection(selectedHomeId, null);
       })
       .finally(() => {
@@ -523,7 +648,9 @@ export const useControlPanel = (): UseControlPanelResult => {
     const handleUpdate = (event: MessageEvent) => {
       try {
         const payload = JSON.parse(event.data) as DeviceUpdateEventPayload;
-        applySnapshot(payload.homeId, payload.device, payload.jobId ?? null);
+        if (applySnapshotRef.current) {
+          applySnapshotRef.current(payload.homeId, payload.device, payload.jobId ?? null);
+        }
       } catch (error) {
         console.error("[control-panel] Error parsing device update event", error);
       }
@@ -532,7 +659,9 @@ export const useControlPanel = (): UseControlPanelResult => {
     const handleErrorEvent = (event: MessageEvent) => {
       try {
         const payload = JSON.parse(event.data) as CommandErrorEventPayload;
-        handleCommandError(payload);
+        if (handleCommandErrorRef.current) {
+          handleCommandErrorRef.current(payload);
+        }
       } catch (error) {
         console.error("[control-panel] Error parsing command error event", error);
       }
@@ -554,7 +683,90 @@ export const useControlPanel = (): UseControlPanelResult => {
       source.close();
       eventSourceRef.current = null;
     };
-  }, [applySnapshot, handleCommandError]);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return;
+    }
+
+    let intervalId: number | null = null;
+
+    const stopInterval = () => {
+      if (intervalId !== null) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const startInterval = () => {
+      if (intervalId !== null || selectedDeviceIdRef.current === null) {
+        return;
+      }
+
+      intervalId = window.setInterval(() => {
+        if (document.visibilityState !== "visible") {
+          return;
+        }
+
+        if (selectedDeviceIdRef.current === null) {
+          stopInterval();
+          return;
+        }
+
+        const refresh = refreshSelectedDeviceRef.current;
+        if (refresh) {
+          void refresh();
+        }
+      }, 30000);
+    };
+
+    const runActiveRefresh = () => {
+      const refreshList = refreshDevicesRef.current;
+      if (refreshList) {
+        void refreshList();
+      }
+
+      if (selectedDeviceIdRef.current !== null) {
+        const refreshDevice = refreshSelectedDeviceRef.current;
+        if (refreshDevice) {
+          void refreshDevice();
+        }
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        runActiveRefresh();
+        startInterval();
+      } else {
+        stopInterval();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      if (document.visibilityState === "visible") {
+        runActiveRefresh();
+        startInterval();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleWindowFocus);
+
+    if (document.visibilityState === "visible") {
+      runActiveRefresh();
+      startInterval();
+    } else {
+      stopInterval();
+    }
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleWindowFocus);
+      stopInterval();
+    };
+  }, [selectedDeviceId]);
 
   const applyPowerCommand = useCallback(
     async (
@@ -623,6 +835,8 @@ export const useControlPanel = (): UseControlPanelResult => {
 
       setSelectedHomeId(nextId);
       setSelectedDeviceId(null);
+      selectedHomeIdRef.current = nextId;
+      selectedDeviceIdRef.current = null;
       setControlState(null);
       setBaselineState(null);
       setLiveTemperature(null);
@@ -637,6 +851,7 @@ export const useControlPanel = (): UseControlPanelResult => {
   const selectDevice = useCallback(
     (deviceId: number) => {
       setSelectedDeviceId(deviceId);
+      selectedDeviceIdRef.current = deviceId;
       setStatusMessage(null);
       setIsUpdatingDevice(false);
       setErrorMessage(null);
@@ -671,6 +886,7 @@ export const useControlPanel = (): UseControlPanelResult => {
 
       if (selectedDeviceId !== device.deviceId) {
         setSelectedDeviceId(device.deviceId);
+        selectedDeviceIdRef.current = device.deviceId;
         persistSelection(selectedHomeId, device.deviceId);
       }
 
