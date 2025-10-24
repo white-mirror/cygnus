@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Cygnus</string>
-    <string name="title_activity_main">Cygnus</string>
-    <string name="package_name">com.cygnus.app</string>
-    <string name="custom_url_scheme">com.cygnus.app</string>
-</resources>
