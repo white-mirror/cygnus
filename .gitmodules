@@ -1,3 +1,12 @@
-[submodule "codebase/backend-api"]
-	path = codebase/backend-api
+[submodule "code/backend/api"]
+	path = code/backend/api
 	url = git@github.com:white-mirror/cygnus-backend-api.git
+[submodule "code/frontend/web"]
+	path = code/frontend/web
+	url = git@github.com:white-mirror/cygnus-frontend-web.git
+[submodule "code/frontend/android"]
+	path = code/frontend/android
+	url = git@github.com:white-mirror/cygnus-frontend-android.git
+[submodule "code/frontend/windows"]
+	path = code/frontend/windows
+	url = git@github.com:white-mirror/cygnus-frontend-windows.git
