@@ -1,6 +1,8 @@
+import { withApiOrigin } from "./config";
 import { ApiError, UnauthorizedError } from "./errors";
 
-const API_BASE = "/api/bgh";
+const API_BASE = withApiOrigin("/api/bgh");
+export const BGH_EVENTS_URL = withApiOrigin("/api/bgh/events");
 
 type LogMeta = Record<string, unknown>;
 

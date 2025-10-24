@@ -1,3 +1,4 @@
+import { withApiOrigin } from "./config";
 import { ApiError, UnauthorizedError } from "./errors";
 
 export interface AuthUser {
@@ -12,7 +13,7 @@ interface MeResponse {
   user: AuthUser;
 }
 
-const AUTH_BASE = "/api/auth";
+const AUTH_BASE = withApiOrigin("/api/auth");
 
 const parseErrorResponse = async (response: Response): Promise<string> => {
   const contentType = response.headers.get("content-type") ?? "";

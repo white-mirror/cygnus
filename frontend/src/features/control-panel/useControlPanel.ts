@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  BGH_EVENTS_URL,
   fetchDeviceStatus,
   fetchDevices,
   fetchHomes,
@@ -50,7 +51,7 @@ type PendingCommand = {
   deviceId: number;
 };
 
-const EVENT_SOURCE_URL = "/api/bgh/events";
+const EVENT_SOURCE_URL = BGH_EVENTS_URL;
 
 export interface ControlPanelHandlers {
   selectHome: (homeId: number | null) => void;

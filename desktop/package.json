@@ -1,0 +1,16 @@
+{
+  "name": "cygnus-desktop",
+  "version": "1.0.0",
+  "description": "Aplicación de escritorio para Cygnus.",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "build:ui": "npm run build:native --prefix ../frontend",
+    "dev": "npm run build:ui && electron .",
+    "pack": "npm run build:ui && electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^26.0.12"
+  }
+}

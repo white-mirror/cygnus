@@ -16,6 +16,34 @@ type LoggedRequest = Request & { log: Logger };
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
+const rawAllowedOrigins = process.env.CORS_ALLOWED_ORIGINS ?? "";
+const allowedOrigins = rawAllowedOrigins
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const defaultAllowedOrigins: Array<string | RegExp> = [
+  /^https?:\/\/localhost(:\d+)?$/i,
+  /^http:\/\/127\.0\.0\.1(:\d+)?$/i,
+  "capacitor://localhost",
+];
+const isOriginPermitted = (origin: string | undefined): boolean => {
+  if (!origin) {
+    return true;
+  }
+  if (
+    allowedOrigins.some(
+      (allowedOrigin) => allowedOrigin.length > 0 && allowedOrigin === origin,
+    )
+  ) {
+    return true;
+  }
+  return defaultAllowedOrigins.some((allowedOrigin) => {
+    if (typeof allowedOrigin === "string") {
+      return allowedOrigin === origin;
+    }
+    return allowedOrigin.test(origin);
+  });
+};
 
 app.use(
   pinoHttp({
@@ -45,7 +73,13 @@ app.use(
 
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (isOriginPermitted(origin ?? undefined)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`Origin not allowed: ${origin ?? "<unknown>"}`));
+    },
     credentials: true,
   }),
 );
