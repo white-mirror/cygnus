@@ -1,5 +1,5 @@
 {
-  "name": "cygnus-backend",
+  "name": "@cygnus/backend-api",
   "version": "1.0.0",
   "description": "API de Cygnus construida con Express y TypeScript.",
   "main": "dist/index.js",

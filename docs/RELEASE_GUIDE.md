@@ -1,145 +1,127 @@
 # Guía de Releases y Despliegues
 
-Este documento resume los pasos necesarios para generar artefactos productivos de Cygnus (backend, frontend web, app Android y desktop Windows) partiendo del monorepo. Todos los comandos deben ejecutarse desde la raíz del repositorio salvo que se indique lo contrario.
+Este documento resume los pasos necesarios para generar artefactos productivos de Cygnus (backend, frontend web, app Android y desktop Windows) partiendo del metarepo. Ejecutá los comandos desde la raíz salvo que se especifique lo contrario.
 
 ## 1. Preparación general
 
-- Node.js >= 20 y npm >= 10 instalados.
-- `npm install`, `npm install --prefix backend`, `npm install --prefix frontend` y `npm install --prefix desktop` ejecutados al menos una vez por estación.
-- Variables de entorno definidas:
-  - Backend (`backend/.env.example`): `PORT`, `LOG_LEVEL`, `CORS_ALLOWED_ORIGINS`, `BGH_EMAIL`, `BGH_PASSWORD`, `BGH_TIMEOUT_MS`.
-  - Frontend (`frontend/.env.example`): `VITE_API_BASE_URL` (vacío para desarrollo) y `VITE_DEV_API_PROXY`.
-  - Producción (`frontend/.env.production`): `VITE_API_BASE_URL=https://<backend-publico>`.
-- Ejecutar los builds verificativos:
+- Node.js >= 20 y npm >= 10.
+- Instalar dependencias por módulo:
   ```bash
-  npm run build --prefix backend
-  npm run build --prefix frontend
+  npm install
+  npm install --prefix codebase/backend-api
+  npm install --prefix codebase/frontend-web
+  npm install --prefix codebase/frontend-android
+  npm install --prefix codebase/frontend-windows
+  ```
+- Variables de entorno:
+  - Backend (`codebase/backend-api/.env.example`): `PORT`, `LOG_LEVEL`, `CORS_ALLOWED_ORIGINS`, `BGH_EMAIL`, `BGH_PASSWORD`, `BGH_TIMEOUT_MS`.
+  - Frontend (`codebase/frontend-web/.env.example`): `VITE_API_BASE_URL` (vacío en dev), `VITE_DEV_API_PROXY`.
+  - Producción (`codebase/frontend-web/.env.production`): `VITE_API_BASE_URL=https://<backend-publico>`.
+- Builds de verificación:
+  ```bash
+  npm run build:backend
+  npm run build:web
   ```
 
 ## 2. Backend (Railway)
 
-1. Subí los cambios a GitHub.
-2. En Railway crea un nuevo servicio desde el repositorio principal.
-   - Directorio (Root directory): `/backend`.
-   - Build command: `npm install && npm run build`.
-   - Start command: `npm run start`.
-   - Runtime sugerido: Node 20.
-3. Configurá las variables de entorno del servicio:
-   - `PORT=4000` (o el puerto que prefieras).
-   - `CORS_ALLOWED_ORIGINS` con la lista de orígenes permitidos (`https://<dominio-vercel>`, `capacitor://localhost`, `http://localhost:5173`).
-   - Credenciales BGH y cualquier secreto adicional.
-4. Desplegá y validá la salud:
+1. Subí los cambios al repositorio.
+2. En Railway creá un servicio nuevo:
+   - Root directory: `/codebase/backend-api`
+   - Build command: `npm install && npm run build`
+   - Start command: `npm run start`
+   - Runtime: Node 20
+3. Variables de entorno: `PORT`, `CORS_ALLOWED_ORIGINS`, `BGH_EMAIL`, `BGH_PASSWORD`, `BGH_TIMEOUT_MS`.
+4. Validá el despliegue:
    ```bash
    curl https://<servicio>.up.railway.app/api/ping
    ```
 
 ### Monorepo en Railway
 
-- Railway permite monorepos siempre que selecciones el subdirectorio correcto (`/backend`). Si usás `railway.json`, podés definir `"rootPath": "backend"`.
-- Las instalaciones se hacen por servicio, por lo que no es necesario separar repositorios.
+- Railway acepta monorepos especificando el subdirectorio (`/codebase/backend-api`). Con `railway.json` podés usar `"rootPath": "codebase/backend-api"`.
 
 ## 3. Frontend Web (Vercel)
 
-1. Asegurate de tener `frontend/.env.production` apuntando al backend de Railway.
-2. Ejecutá el build localmente si querés validar:
+1. Confirmá `codebase/frontend-web/.env.production` con la URL pública del backend.
+2. Build opcional local:
    ```bash
-   npm run build --prefix frontend
+   npm run build:web
    ```
 3. En Vercel:
-   - Importá el mismo repositorio.
-   - Directorio raíz: `/frontend`.
-   - Framework: “Vite”.
-   - Build command: `npm run build`.
-   - Output directory: `dist`.
-   - Alias de producción: por ejemplo `cygnus-frontend`.
-4. Configurá las variables de entorno (`VITE_API_BASE_URL`, opcionalmente `NODE_OPTIONS=--max_old_space_size=3072` si necesitás más memoria en builds grandes).
-5. Desplegá y verificá que la aplicación utilice el backend remoto.
-
-### Monorepo en Vercel
-
-- Vercel permite especificar el directorio raíz (`Project Settings → General → Root Directory`). No es necesario extraer el frontend a otro repo.
-- Si querés evitar que el directorio `/backend` dispare builds, podés definir un “Ignored Build Step” como `cd .. && npm run lint --if-present`. No suele ser necesario.
+   - Root directory: `/codebase/frontend-web`
+   - Framework: Vite
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Definí `VITE_API_BASE_URL` (y otros env vars necesarios) en los entornos Production/Preview.
 
 ## 4. App Android (Capacitor)
 
-1. Preparativos únicos por estación:
+1. Preparación por estación:
    ```bash
-   npm install --prefix frontend
-   npm run cap:add --prefix frontend -- android
+  npm install --prefix codebase/frontend-android
+  npm run add:android
    ```
-2. Generar artefacto nativo (cada release):
+2. Construir assets y sincronizar:
    ```bash
-   npm run build:android --prefix frontend
+   npm run build:android
    ```
-   Este comando ejecuta `npm run build:native --prefix frontend` (que produce assets con `base: "./"`) y luego sincroniza con Capacitor.
-3. Abrir en Android Studio:
+   Esto ejecuta `npm run build:native --prefix codebase/frontend-web` y copia los assets al proyecto Android mediante `cap sync`.
+3. Abrir Android Studio:
    ```bash
-   npm run open:android --prefix frontend
+   npm run open:android --prefix codebase/frontend-android
    ```
-4. Dentro de Android Studio:
-   - Configurá la firma (`Build > Generate Signed Bundle/APK`) y generá `.aab` o `.apk`.
-   - Los artefactos quedan en `frontend/android/app/build/outputs/`.
+4. En Android Studio generá el bundle (`Build > Generate Signed Bundle/APK`). Los artefactos se guardan en `codebase/frontend-android/android/app/build/outputs/`.
 
-### Notas importantes
-
-- Si necesitás apuntar a un backend distinto sin rebuild, actualizá `frontend/android/app/src/main/assets/capacitor.config.json`.
-- Para pruebas en LAN sin HTTPS, podés exportar `CAP_SERVER_URL=http://<ip>:<port>` antes de correr `npm run build:android`.
-- Verificá los permisos del dispositivo/emulador para tráfico http (Android 9+ requiere `network_security_config` si usás HTTP plano).
+**Notas**
+- Para apuntar a otro backend sin rebuild, actualizá `codebase/frontend-android/android/app/src/main/assets/capacitor.config.json`.
+- Para backend HTTP en LAN exportá `CAP_SERVER_URL=http://<ip>:<port>` antes de `npm run build:android`.
 
 ## 5. App Desktop (Electron + electron-builder)
 
-1. Instalá dependencias (una vez por estación):
+1. Instalá dependencias:
    ```bash
-   npm install --prefix desktop
+   npm install --prefix codebase/frontend-windows
    ```
-2. Generá el instalador de Windows:
+2. Generá el instalador:
    ```bash
-   npm run pack --prefix desktop
+   npm run pack:windows
    ```
-   - El script compila el frontend en modo `native` y ejecuta `electron-builder`.
-   - El instalador queda en `desktop/dist/`.
+   El instalador queda en `codebase/frontend-windows/dist/`.
 3. Requisitos en Windows:
-   - Ejecutar la terminal como administrador **o** activar “Developer Mode” (Settings → Privacy & Security → For developers) para permitir symlinks.
-   - Si aparece el error `A required privilege is not held by the client`, borrá `C:\Users\<usuario>\AppData\Local\electron-builder\Cache\winCodeSign` y reintentá.
-4. Para desarrollo local:
+   - Ejecutar la terminal como administrador o activar “Developer Mode” para permitir symlinks.
+   - Si aparece `A required privilege is not held by the client`, eliminá `C:\Users\<usuario>\AppData\Local\electron-builder\Cache\winCodeSign` y reintentá.
+4. Desarrollo local:
    ```bash
-   npm run dev --prefix desktop
+   npm run dev --prefix codebase/frontend-windows
    ```
-   Esto reconstruye el frontend y abre la app Electron apuntando al build nativo más reciente.
 
-## 6. Secuencia para un release completo
+## 6. Secuencia para una release
 
-1. Verificar builds:
+1. Builds:
    ```bash
-   npm run build --prefix backend
-   npm run build --prefix frontend
-   npm run build:android --prefix frontend   # genera assets y sync
-   npm run pack --prefix desktop             # generar instalador
+   npm run build:backend
+   npm run build:web
+   npm run build:android
+   npm run pack:windows
    ```
-2. Desplegar backend en Railway (pasos sección 2).
-3. Desplegar frontend en Vercel (sección 3).
-4. Generar APK/AAB firmado desde Android Studio.
-5. Generar instalador Windows (`desktop/dist/...`).
-6. Etiquetar release en Git:
+2. Desplegá backend (Railway) y frontend (Vercel).
+3. Generá APK/AAB y `.exe`.
+4. Taggea:
    ```bash
    git tag vX.Y.Z
    git push origin vX.Y.Z
    ```
-7. Publicar release en GitHub adjuntando:
-   - URL de backend y frontend.
-   - APK/AAB y `.exe`.
-   - Notas de cambios y pasos de verificación manual.
+5. Publicá release en GitHub con enlaces/artefactos y notas de QA manual.
 
 ## 7. Troubleshooting rápido
 
 | Problema | Solución |
 |----------|----------|
-| `A required privilege is not held by the client` en `npm run pack --prefix desktop` | Activar Developer Mode o ejecutar terminal como admin; borrar caché `winCodeSign`. |
-| Pantalla en blanco en Electron | Asegurarse de usar `npm run build:native --prefix frontend` antes de empaquetar; verificar `frontend/.env.production`. |
-| `npm exec cap …` no encuentra binario | Utilizar los scripts `npm run cap:*` definidos en `frontend/package.json`, que llaman al CLI directamente desde `node_modules`. |
-| Vite sirve assets desde `/` en native build | Confirmar que se ejecutó `npm run build:native --prefix frontend`; este comando fuerza `base: "./"`. |
-| CORS falla para Vercel/Capacitor | Incluir los dominios en `CORS_ALLOWED_ORIGINS` separados por comas (`https://<dominio-vercel>,capacitor://localhost`). |
+| `A required privilege is not held by the client` en `npm run pack:windows` | Habilitar Developer Mode o ejecutar la consola como admin; limpiar caché `winCodeSign`. |
+| Pantalla en blanco en Electron | Ejecutar `npm run build:native --prefix codebase/frontend-web` antes de empaquetar y verificar `codebase/frontend-web/.env.production`. |
+| `npm exec cap …` no encuentra binario | Utilizar los scripts del módulo Android (`npm run cap:*` en `codebase/frontend-android`). |
+| Assets servidos desde `/` en build nativa | Asegurarse de correr `npm run build:native --prefix codebase/frontend-web`. |
+| CORS bloqueado | Incluir todos los orígenes en `CORS_ALLOWED_ORIGINS` (`https://<dominio-vercel>,capacitor://localhost`, etc.). |
 
----
-
-Actualizá este documento cada vez que se agregue un nuevo target de despliegue o cambien los scripts. Si algún proveedor modifica requisitos (por ejemplo, límites de Railway o Vercel), aclaralo en secciones específicas.
+Actualizá la guía cada vez que cambien scripts o proveedores.

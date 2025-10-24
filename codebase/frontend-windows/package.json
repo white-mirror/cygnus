@@ -1,11 +1,11 @@
 {
-  "name": "cygnus-desktop",
+  "name": "@cygnus/frontend-windows",
   "version": "1.0.0",
   "description": "Aplicación de escritorio para Cygnus.",
   "main": "main.js",
   "private": true,
   "scripts": {
-    "build:ui": "npm run build:native --prefix ../frontend",
+    "build:ui": "npm run build:native --prefix ../frontend-web",
     "dev": "npm run build:ui && electron .",
     "pack": "npm run build:ui && electron-builder --win"
   },

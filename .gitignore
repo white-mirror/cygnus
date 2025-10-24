@@ -1,12 +1,13 @@
 ﻿# Dependencies
 node_modules/
+codebase/**/node_modules/
 
 # Build outputs
 dist/
 build/
-desktop/dist/
-frontend/android/app/build/
-frontend/android/.gradle/
+codebase/**/dist/
+codebase/frontend-android/android/app/build/
+codebase/frontend-android/android/.gradle/
 coverage/
 *.tsbuildinfo
 

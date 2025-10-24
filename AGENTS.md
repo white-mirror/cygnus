@@ -2,18 +2,22 @@
 
 ## Project Structure & Module Organization
 
-- `backend/` – Express API (source in `src/`, integrations in `integrations/`, build output in `dist/`).
-- `frontend/` – Vite + React app; entry `src/main.tsx`, UI components live under `src/`.
-- Root `package.json` holds shared scripts; Codex CLI defaults live in this guide and should be copied into each contributor's `~/.codex/config.toml`. Keep backend/frontend changes scoped unless a feature spans both.
-- Put static assets in `frontend/public` and internal utilities beside their consumers.
+- `codebase/backend-api/` – Express API (source en `src/`, integraciones en `integrations/`, build en `dist/`).
+- `codebase/frontend-web/` – Vite + React (entrada `src/main.tsx`).
+- `codebase/frontend-android/` – Wrapper Capacitor que usa la build nativa de `frontend-web`.
+- `codebase/frontend-windows/` – Wrapper Electron que consume la build nativa de `frontend-web`.
+- Root `package.json` holds shared scripts; Codex CLI defaults live in this guide and should be copied into each contributor's `~/.codex/config.toml`. Keep backend-api y frontends scoped unless a feature spans multiple módulos.
+- Put static assets in `codebase/frontend-web/public` y utilidades internas cerca de sus consumidores.
 
 ## Build, Test, and Development Commands
 
-- `npm run dev` – runs both servers via `concurrently`.
-- `npm run dev --prefix backend` – starts the API with `ts-node-dev` reloads.
-- `npm run dev --prefix frontend` – launches the Vite dev server.
-- `npm run build --prefix backend` – emits compiled JS to `backend/dist`.
-- `npm run build --prefix frontend` – type-checks and produces production assets.
+- `npm run dev` – arranca backend + web.
+- `npm run dev:backend` – inicia la API (`codebase/backend-api`).
+- `npm run dev:web` – lanza Vite (`codebase/frontend-web`).
+- `npm run build:backend` – compile backend a `codebase/backend-api/dist`.
+- `npm run build:web` – genera assets web.
+- `npm run build:android` – build+nativo+sync Capacitor.
+- `npm run pack:windows` – empaqueta la app Electron.
 - `npm run format` – runs Prettier across the workspace.
 
 ## Coding Style & Naming Conventions
@@ -25,8 +29,8 @@
 
 ## Testing Guidelines
 
-- No automated suite yet; add colocated tests (`backend/src/__tests__`, `frontend/src/**/*.test.tsx`) when introducing coverage.
-- Until then, run both build commands before opening a PR and note any manual QA steps in the description.
+- No automated suite yet; añadí tests en `codebase/backend-api/src/__tests__` y `codebase/frontend-web/src/**/*.test.tsx` cuando corresponda.
+- Mientras tanto, ejecutá `npm run build:backend` y `npm run build:web` antes de abrir PR, anotando cualquier QA manual.
 
 ## Commit & Pull Request Guidelines
 
@@ -38,7 +42,7 @@
 
 - Backend reads `PORT` and future secrets from the environment; document defaults in README or `.env.example`.
 - Update TypeScript + ESLint stacks together to keep types, lint rules, and configs in sync.
-- Never commit credentials; store integration notes under `backend/integrations/<vendor>/README.md` when needed.
+- Never commit credentials; store integration notes under `codebase/backend-api/integrations/<vendor>/README.md` when needed.
 
 ## Working Agreement for Codex
 
@@ -53,14 +57,14 @@
 - Execution:
   - Default to inspecting and proposing changes; only run commands when helpful for validation.
   - Keep changes minimal and localized; avoid unrelated refactors.
-  - Co-locate utilities with consumers; keep backend/frontend scoped unless a feature spans both.
+  - Co-locate utilities with consumers; mantené los cambios acotados al módulo afectado (backend-api o el frontend correspondiente) salvo que el feature requiera coordinar varios.
 - Commands & Scripts:
-  - Dev servers: `npm run dev` (both), or `npm run dev --prefix backend`, `npm run dev --prefix frontend`.
-  - Builds: `npm run build --prefix backend`, `npm run build --prefix frontend`.
-  - Formatting: `npm run format` (Prettier 3 configured; two-space, double quotes, trailing commas).
+  - Dev servers: `npm run dev` (ambos), `npm run dev:backend`, `npm run dev:web`.
+  - Builds: `npm run build:backend`, `npm run build:web`, `npm run build:android`, `npm run pack:windows`.
+- Formatting: `npm run format` (Prettier 3 configured; two-space, double quotes, trailing commas).
 - Validation:
-  - When code changes are made, run both build commands to catch type/build issues when permitted.
-  - If tests are added, colocate them (`backend/src/__tests__`, `frontend/src/**/*.test.tsx`) and run just-affected portions first.
+  - When code changes are made, run the build scripts correspondientes (`build:backend`, `build:web`) cuando sea posible.
+  - If tests are added, colocate them (`codebase/backend-api/src/__tests__`, `codebase/frontend-web/src/**/*.test.tsx`) y ejecutá solo lo afectado primero.
   - Document any manual QA steps in PR descriptions.
 - Safety & Approvals:
   - Always ask before: package installs, starting servers, network calls, or editing >5 files at once.

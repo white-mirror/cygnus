@@ -1,10 +1,18 @@
 {
   "name": "cygnus",
   "version": "1.0.0",
-  "description": "Monorepo de Cygnus: plataforma para administrar dispositivos con un backend Express y un frontend React.",
+  "description": "Metarepo de Cygnus que agrupa los módulos backend y frontends empaquetados.",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\"",
+    "dev:backend": "npm run dev --prefix codebase/backend-api",
+    "dev:web": "npm run dev --prefix codebase/frontend-web",
+    "build:backend": "npm run build --prefix codebase/backend-api",
+    "build:web": "npm run build:web --prefix codebase/frontend-web",
+    "build:android": "npm run build --prefix codebase/frontend-android",
+    "pack:windows": "npm run pack --prefix codebase/frontend-windows",
+    "add:android": "npm run cap:add --prefix codebase/frontend-android",
+    "sync:android": "npm run sync --prefix codebase/frontend-android",
     "format": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

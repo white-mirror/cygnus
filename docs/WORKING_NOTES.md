@@ -41,8 +41,10 @@ High‑level summary of modified files and intent.
 - File/path — brief rationale
 
 ## Validation
-- Build backend: `npm run build --prefix backend` — result:
-- Build frontend: `npm run build --prefix frontend` — result:
+- Build backend: `npm run build:backend` — result:
+- Build frontend web: `npm run build:web` — result:
+- Build Android: `npm run build:android` — result:
+- Pack Windows: `npm run pack:windows` — result:
 - Manual checks/UI screenshots:
 - Tests added/updated (if any):
 

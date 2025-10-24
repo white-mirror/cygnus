@@ -29,11 +29,13 @@ Execution
 - Keep changes minimal and localized; avoid unrelated refactors. Co-locate utilities with consumers.
 
 Repo Commands (npm)
-- Dev (both): `npm run dev`
-- Dev (backend): `npm run dev --prefix backend`
-- Dev (frontend): `npm run dev --prefix frontend`
-- Build (backend): `npm run build --prefix backend`
-- Build (frontend): `npm run build --prefix frontend`
+- Dev (ambos): `npm run dev`
+- Dev (backend): `npm run dev:backend`
+- Dev (frontend web): `npm run dev:web`
+- Build (backend): `npm run build:backend`
+- Build (frontend web): `npm run build:web`
+- Build (Android): `npm run build:android`
+- Pack (Windows): `npm run pack:windows`
 - Format (Prettier 3): `npm run format`
 
 Code Style
@@ -42,8 +44,8 @@ Code Style
 - Save files UTF-8 without BOM.
 
 Validation
-- When code changes are made, run both build commands to catch type/build issues when allowed.
-- If adding tests, colocate them (`backend/src/__tests__`, `frontend/src/**/*.test.tsx`) and focus on affected areas first.
+- When code changes are made, ejecutá `npm run build:backend` y/o `npm run build:web` según corresponda.
+- If adding tests, colocate them (`codebase/backend-api/src/__tests__`, `codebase/frontend-web/src/**/*.test.tsx`) y enfocá primero las áreas afectadas.
 
 Git & PRs
 - Conventional commit prefixes (`chore:`, `style:`, `feat:`). Keep commits focused.

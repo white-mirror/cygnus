@@ -1,5 +1,5 @@
 {
-  "name": "cygnus-frontend",
+  "name": "@cygnus/frontend-web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,15 +11,9 @@
     "build:web": "tsc --noEmit && vite build",
     "build:native": "tsc --noEmit && vite build --mode native",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "cap:add": "node ./node_modules/@capacitor/cli/bin/capacitor add",
-    "cap:sync": "node ./node_modules/@capacitor/cli/bin/capacitor sync",
-    "build:android": "npm run build:native && npm run cap:sync -- android",
-    "open:android": "node ./node_modules/@capacitor/cli/bin/capacitor open android"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@capacitor/android": "^6.2.0",
-    "@capacitor/core": "^6.2.0",
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.0",
@@ -27,7 +21,6 @@
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.2.0",
     "@eslint/js": "^9.36.0",
     "@types/node": "^24.6.0",
     "@types/react": "^19.1.13",
