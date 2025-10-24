@@ -45,7 +45,7 @@ Code Style
 
 Validation
 - When code changes are made, ejecutá `npm run build:backend` y/o `npm run build:web` según corresponda.
-- If adding tests, colocate them (`codebase/backend-api/src/__tests__`, `codebase/frontend-web/src/**/*.test.tsx`) y enfocá primero las áreas afectadas.
+- If adding tests, colocate them (`code/backend/api/src/__tests__`, `code/frontend/web/src/**/*.test.tsx`) y enfocá primero las áreas afectadas.
 
 Git & PRs
 - Conventional commit prefixes (`chore:`, `style:`, `feat:`). Keep commits focused.

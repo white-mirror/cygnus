@@ -2,19 +2,19 @@
 
 ## Project Structure & Module Organization
 
-- `codebase/backend-api/` – Express API (source en `src/`, integraciones en `integrations/`, build en `dist/`).
-- `codebase/frontend-web/` – Vite + React (entrada `src/main.tsx`).
-- `codebase/frontend-android/` – Wrapper Capacitor que usa la build nativa de `frontend-web`.
-- `codebase/frontend-windows/` – Wrapper Electron que consume la build nativa de `frontend-web`.
+- `code/backend/api/` – Express API (source en `src/`, integraciones en `integrations/`, build en `dist/`).
+- `code/frontend/web/` – Vite + React (entrada `src/main.tsx`).
+- `code/frontend/android/` – Wrapper Capacitor que usa la build nativa de `frontend/web`.
+- `code/frontend/windows/` – Wrapper Electron que consume la build nativa de `frontend/web`.
 - Root `package.json` holds shared scripts; Codex CLI defaults live in this guide and should be copied into each contributor's `~/.codex/config.toml`. Keep backend-api y frontends scoped unless a feature spans multiple módulos.
-- Put static assets in `codebase/frontend-web/public` y utilidades internas cerca de sus consumidores.
+- Put static assets in `code/frontend/web/public` y utilidades internas cerca de sus consumidores.
 
 ## Build, Test, and Development Commands
 
 - `npm run dev` – arranca backend + web.
-- `npm run dev:backend` – inicia la API (`codebase/backend-api`).
-- `npm run dev:web` – lanza Vite (`codebase/frontend-web`).
-- `npm run build:backend` – compile backend a `codebase/backend-api/dist`.
+- `npm run dev:backend` – inicia la API (`code/backend/api`).
+- `npm run dev:web` – lanza Vite (`code/frontend/web`).
+- `npm run build:backend` – compile backend a `code/backend/api/dist`.
 - `npm run build:web` – genera assets web.
 - `npm run build:android` – build+nativo+sync Capacitor.
 - `npm run pack:windows` – empaqueta la app Electron.
@@ -29,7 +29,7 @@
 
 ## Testing Guidelines
 
-- No automated suite yet; añadí tests en `codebase/backend-api/src/__tests__` y `codebase/frontend-web/src/**/*.test.tsx` cuando corresponda.
+- No automated suite yet; añadí tests en `code/backend/api/src/__tests__` y `code/frontend/web/src/**/*.test.tsx` cuando corresponda.
 - Mientras tanto, ejecutá `npm run build:backend` y `npm run build:web` antes de abrir PR, anotando cualquier QA manual.
 
 ## Commit & Pull Request Guidelines
@@ -42,7 +42,7 @@
 
 - Backend reads `PORT` and future secrets from the environment; document defaults in README or `.env.example`.
 - Update TypeScript + ESLint stacks together to keep types, lint rules, and configs in sync.
-- Never commit credentials; store integration notes under `codebase/backend-api/integrations/<vendor>/README.md` when needed.
+- Never commit credentials; store integration notes under `code/backend/api/integrations/<vendor>/README.md` when needed.
 
 ## Working Agreement for Codex
 
@@ -64,7 +64,7 @@
 - Formatting: `npm run format` (Prettier 3 configured; two-space, double quotes, trailing commas).
 - Validation:
   - When code changes are made, run the build scripts correspondientes (`build:backend`, `build:web`) cuando sea posible.
-  - If tests are added, colocate them (`codebase/backend-api/src/__tests__`, `codebase/frontend-web/src/**/*.test.tsx`) y ejecutá solo lo afectado primero.
+  - If tests are added, colocate them (`code/backend/api/src/__tests__`, `code/frontend/web/src/**/*.test.tsx`) y ejecutá solo lo afectado primero.
   - Document any manual QA steps in PR descriptions.
 - Safety & Approvals:
   - Always ask before: package installs, starting servers, network calls, or editing >5 files at once.
