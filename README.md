@@ -68,7 +68,6 @@ El backend lee las variables desde un archivo `.env` o del entorno del sistema. 
 - `PORT`: Puerto HTTP para la API (por defecto `4000`).
 - `LOG_LEVEL`: Nivel de logging para Pino (por defecto `info`).
 - `CORS_ALLOWED_ORIGINS`: Lista separada por comas con los orígenes permitidos (por ejemplo `https://cygnus-frontend.vercel.app,capacitor://localhost`).
-- `BGH_EMAIL` y `BGH_PASSWORD`: Credenciales para autenticarse contra la API de BGH.
 - `BGH_TIMEOUT_MS`: Timeout opcional (en milisegundos) para requests al servicio de BGH.
 
 En el frontend creá un archivo `.env` basado en `.env.example` con:
@@ -90,7 +89,7 @@ Para la compilación productiva podés duplicar `.env.production.example` y comp
 3. Configurá el directorio raíz como `/code/backend/api` y los comandos:
    - Build: `npm install && npm run build`
    - Start: `npm run start`
-4. Definí las variables de entorno (`PORT`, `CORS_ALLOWED_ORIGINS`, `BGH_EMAIL`, `BGH_PASSWORD`, etc.).
+4. Definí las variables de entorno necesarias (`PORT`, `CORS_ALLOWED_ORIGINS`, `LOG_LEVEL`, `BGH_TIMEOUT_MS`, etc.).
 5. Desplegá y verificá con:
    ```bash
    curl https://<tu-servicio>.up.railway.app/api/ping

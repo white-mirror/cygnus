@@ -14,7 +14,7 @@ Este documento resume los pasos necesarios para generar artefactos productivos d
   npm install --prefix code/frontend/windows
   ```
 - Variables de entorno:
-  - Backend (`code/backend/api/.env.example`): `PORT`, `LOG_LEVEL`, `CORS_ALLOWED_ORIGINS`, `BGH_EMAIL`, `BGH_PASSWORD`, `BGH_TIMEOUT_MS`.
+  - Backend (`code/backend/api/.env.example`): `PORT`, `LOG_LEVEL`, `CORS_ALLOWED_ORIGINS`, `BGH_TIMEOUT_MS`.
   - Frontend (`code/frontend/web/.env.example`): `VITE_API_BASE_URL` (vacío en dev), `VITE_DEV_API_PROXY`.
   - Producción (`code/frontend/web/.env.production`): `VITE_API_BASE_URL=https://<backend-publico>`.
 - Builds de verificación:
@@ -31,7 +31,7 @@ Este documento resume los pasos necesarios para generar artefactos productivos d
    - Build command: `npm install && npm run build`
    - Start command: `npm run start`
    - Runtime: Node 20
-3. Variables de entorno: `PORT`, `CORS_ALLOWED_ORIGINS`, `BGH_EMAIL`, `BGH_PASSWORD`, `BGH_TIMEOUT_MS`.
+3. Variables de entorno: `PORT`, `CORS_ALLOWED_ORIGINS`, `BGH_TIMEOUT_MS` (opcional) y cualquier secreto adicional que necesites.
 4. Validá el despliegue:
    ```bash
    curl https://<servicio>.up.railway.app/api/ping
