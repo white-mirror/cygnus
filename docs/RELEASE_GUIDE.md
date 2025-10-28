@@ -71,10 +71,11 @@ Este documento resume los pasos necesarios para generar artefactos productivos d
    ```bash
    npm run open:android --prefix code/frontend/android
    ```
-4. En Android Studio generá el bundle (`Build > Generate Signed Bundle/APK`). Los artefactos se guardan en `code/frontend/android/android/app/build/outputs/`.
+4. En Android Studio generá el bundle (`Build > Generate Signed Bundle/APK`). Los artefactos se guardan en `code/frontend/android/app/build/outputs/`.
 
 **Notas**
-- Para apuntar a otro backend sin rebuild, actualizá `code/frontend/android/android/app/src/main/assets/capacitor.config.json`.
+
+- Para apuntar a otro backend sin rebuild, actualizá `code/frontend/android/app/src/main/assets/capacitor.config.json`.
 - Para backend HTTP en LAN exportá `CAP_SERVER_URL=http://<ip>:<port>` antes de `npm run build:android`.
 
 ## 5. App Desktop (Electron + electron-builder)
@@ -116,12 +117,12 @@ Este documento resume los pasos necesarios para generar artefactos productivos d
 
 ## 7. Troubleshooting rápido
 
-| Problema | Solución |
-|----------|----------|
-| `A required privilege is not held by the client` en `npm run pack:windows` | Habilitar Developer Mode o ejecutar la consola como admin; limpiar caché `winCodeSign`. |
-| Pantalla en blanco en Electron | Ejecutar `npm run build:native --prefix code/frontend/web` antes de empaquetar y verificar `code/frontend/web/.env.production`. |
-| `npm exec cap …` no encuentra binario | Utilizar los scripts del módulo Android (`npm run cap:*` en `code/frontend/android`). |
-| Assets servidos desde `/` en build nativa | Asegurarse de correr `npm run build:native --prefix code/frontend/web`. |
-| CORS bloqueado | Incluir todos los orígenes en `CORS_ALLOWED_ORIGINS` (`https://<dominio-vercel>,capacitor://localhost`, etc.). |
+| Problema                                                                   | Solución                                                                                                                        |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `A required privilege is not held by the client` en `npm run pack:windows` | Habilitar Developer Mode o ejecutar la consola como admin; limpiar caché `winCodeSign`.                                         |
+| Pantalla en blanco en Electron                                             | Ejecutar `npm run build:native --prefix code/frontend/web` antes de empaquetar y verificar `code/frontend/web/.env.production`. |
+| `npm exec cap …` no encuentra binario                                      | Utilizar los scripts del módulo Android (`npm run cap:*` en `code/frontend/android`).                                           |
+| Assets servidos desde `/` en build nativa                                  | Asegurarse de correr `npm run build:native --prefix code/frontend/web`.                                                         |
+| CORS bloqueado                                                             | Incluir todos los orígenes en `CORS_ALLOWED_ORIGINS` (`https://<dominio-vercel>,capacitor://localhost`, etc.).                  |
 
 Actualizá la guía cada vez que cambien scripts o proveedores.

@@ -125,9 +125,9 @@ Para la compilación productiva podés duplicar `.env.production.example` y comp
    ```bash
    npm run open:android --prefix code/frontend/android
    ```
-5. Configurá la firma y creá el artefacto (`Build > Generate Signed Bundle / APK`). Los archivos quedarán bajo `code/frontend/android/android/app/build/outputs/`.
+5. Configurá la firma y creá el artefacto (`Build > Generate Signed Bundle / APK`). Los archivos quedarán bajo `code/frontend/android/app/build/outputs/`.
 
-Opcional: si necesitás apuntar a un backend distinto sin regenerar el build, actualizá `code/frontend/android/android/app/src/main/assets/capacitor.config.json`.
+Opcional: si necesitás apuntar a un backend distinto sin regenerar el build, actualizá `code/frontend/android/app/src/main/assets/capacitor.config.json`.
 
 ### App de escritorio (Electron)
 
