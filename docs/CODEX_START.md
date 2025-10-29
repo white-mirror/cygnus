@@ -70,5 +70,6 @@ When ready, briefly restate your understanding and ask any quick clarifying ques
 ---
 
 Tips
+
 - Keep this file handy and paste it into any new session to restore context quickly.
 - If you want persistent work logs, add a `docs/WORKING_NOTES.md` in git and capture task, plan, decisions, and pending items as you go.
