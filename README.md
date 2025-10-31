@@ -9,28 +9,28 @@ Cygnus es una plataforma interna para administrar dispositivos conectados desde 
 
 ## Instalación
 
-Ejecutá las instalaciones desde la raíz del proyecto para preparar cada paquete:
+El repositorio ahora funciona como un workspace de npm. Con un único comando desde la raíz se instalan las dependencias de todos los paquetes (backend, frontend y escritorio):
 
 ```bash
 npm install
-npm install --prefix backend
-npm install --prefix frontend
 ```
+
+Si necesitás reinstalar un paquete puntual podés hacerlo con `npm install --workspace <nombre>`, por ejemplo `npm install --workspace backend`.
 
 ## Ejecución en desarrollo
 
 ### Backend
 
 ```bash
-npm run dev --prefix backend
+npm run dev --workspace backend
 ```
 
-El servidor queda disponible en `http://localhost:4000` y recarga automáticamente al detectar cambios en TypeScript. Podés ajustar el puerto seteando la variable de entorno `PORT`.
+El servidor queda disponible en `http://localhost:4000` y recarga automáticamente al detectar cambios en TypeScript. Podés ajustar el puerto seteando la variable de entorno `PORT`. Si preferís la sintaxis previa todavía podés usar `npm run dev --prefix backend`.
 
 ### Frontend
 
 ```bash
-npm run dev --prefix frontend
+npm run dev --workspace frontend
 ```
 
 La interfaz se sirve en `http://localhost:5173`. El comando utiliza Vite y habilita recarga en caliente.
@@ -49,12 +49,14 @@ El script invoca ambos servidores con `concurrently` para que corran en paralelo
 
 - `backend/`: API REST escrita en TypeScript con Express, configurada con CORS, logging y rutas de autenticación.
 - `frontend/`: Aplicación React + Vite que consume la API y ofrece el panel de control.
-- `docs/`: Guías para agentes Codex y notas de trabajo.
+- `desktop/`: Cliente de escritorio en Electron que reutiliza el build nativo del frontend.
+- `docs/`: Guías para agentes Codex y notas de trabajo (ver `docs/architecture/project-structure.md` para el detalle de la reestructuración).
 
 ## Formato y verificación
 
 - Formateo: `npm run format` ejecuta Prettier sobre todo el proyecto.
-- Builds individuales: `npm run build --prefix backend` y `npm run build --prefix frontend`.
+- Builds individuales: `npm run build --workspace backend`, `npm run build --workspace frontend` y `npm run build --workspace desktop`.
+- Build general del monorepo: `npm run build`.
 - Testing del backend: `npm run test --prefix backend` ejecuta Vitest (cuando haya pruebas). Actualmente no hay tests para el frontend.
 
 ## Variables de entorno
@@ -80,7 +82,7 @@ Para la compilación productiva podés duplicar `.env.production.example` y comp
 
 1. Asegurate de tener el build listo:
    ```bash
-   npm run build --prefix backend
+   npm run build --workspace backend
    ```
 2. Subí los cambios a GitHub y, desde la UI de Railway, creá un nuevo servicio seleccionando el repositorio.
 3. Configurá el directorio raíz como `/backend` y los comandos:
@@ -96,7 +98,7 @@ Para la compilación productiva podés duplicar `.env.production.example` y comp
 
 1. Generá los assets:
    ```bash
-   npm run build --prefix frontend
+   npm run build --workspace frontend
    ```
 2. En Vercel importá el repositorio y seleccioná `/frontend` como directorio raíz.
 3. Configurá el framework como “Vite”, comando de build `npm run build` y carpeta de salida `dist`.
@@ -107,20 +109,20 @@ Para la compilación productiva podés duplicar `.env.production.example` y comp
 
 1. Instalá dependencias (solo la primera vez):
    ```bash
-   npm install --prefix frontend
+   npm install --workspace frontend
    ```
 2. Agregá la plataforma Android (una sola vez):
    ```bash
-   npm run cap:add --prefix frontend -- android
+   npm run cap:add --workspace frontend -- android
    ```
 3. Compilá el frontend y sincronizá Capacitor:
    ```bash
-   npm run build:android --prefix frontend
+   npm run build:android --workspace frontend
    ```
    El comando compila Vite y ejecuta `npm run cap:sync -- android`, generando/actualizando el proyecto nativo.
 4. Abrí el proyecto en Android Studio:
    ```bash
-   npm run open:android --prefix frontend
+   npm run open:android --workspace frontend
    ```
 5. Configurá la firma y creá el artefacto (`Build > Generate Signed Bundle / APK`). Los archivos quedarán bajo `frontend/android/app/build/outputs/`.
 
@@ -130,16 +132,16 @@ Opcional: si necesitás apuntar a un backend distinto sin regenerar el build, ac
 
 1. Instalá las dependencias de la carpeta `desktop` (solo una vez):
    ```bash
-   npm install --prefix desktop
+   npm install --workspace desktop
    ```
 2. Generá la build web y empaquetá para Windows:
    ```bash
-   npm run pack --prefix desktop
+   npm run pack --workspace desktop
    ```
    El instalador (`.exe`) se guarda en `desktop/dist/`. Si el proceso falla con el mensaje `A required privilege is not held by the client`, habilitá el **Developer Mode** de Windows (`Settings → Privacy & Security → For developers`) o abrí la terminal como administrador para permitir la creación de symlinks.
 3. Para desarrollo local podés usar:
    ```bash
-   npm run dev --prefix desktop
+   npm run dev --workspace desktop
    ```
    Esto reconstruye el frontend y abre la app en modo escritorio.
 

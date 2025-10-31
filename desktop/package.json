@@ -5,6 +5,7 @@
   "main": "main.js",
   "private": true,
   "scripts": {
+    "build": "npm run build:ui",
     "build:ui": "npm run build:native --prefix ../frontend",
     "dev": "npm run build:ui && electron .",
     "pack": "npm run build:ui && electron-builder --win"
